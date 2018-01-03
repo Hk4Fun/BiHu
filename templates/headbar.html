@@ -1,0 +1,108 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include 'static_lib.html' %}
+</head>
+
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-2">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target=".navbar-responsive-collapse">
+                    <span class="sr-only">Toggle navigtion</span>
+                </button>
+                <a href="{% url 'index' %}"><img width="70" height="50" src="{% static 'img/logo.png' %}"></a>
+
+            </div>
+            <div class="collapse navbar-collapse navbar-responsive-collapse">
+                <form class="navbar-form navbar-left">
+                    <div class="form-group">
+                        <input id="searchText" type="text" value="{{ searchStr|default:"" }}" class="form-control"
+                               size="50" placeholder="搜索你感兴趣的问题或标签"/>
+                    </div>
+                    <button type="button" id="searchButton" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </form>
+                <ul class="nav navbar-nav">
+                    <li class="active">
+                        <a href="{% url 'index' %}"><span class="glyphicon glyphicon-home">首页</span></a>
+
+                    </li>
+
+                </ul>
+
+                <ul class="nav navbar-nav">
+                    <li>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal"
+                                data-target="#myModal">提问
+                        </button>
+
+                    </li>
+
+                    {#                    <li>#}
+                    {#                        <a href="{% url 'answer' %}" class="navbar-link" style="color: #337ab7;font-size: 18px;">回答#}
+                    {#                        </a>#}
+                    {#                    </li>#}
+                    <li>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </li>
+                    <li>
+                        {% if request.user.is_authenticated %}
+                            <a href="" class="dropdown-toggle " data-toggle="dropdown">
+                                {% if request.user.nickname %}
+                                    <b>{{ request.user.nickname }}</b>
+                                {% else %}
+                                    <b>{{ request.user.username }}</b>
+                                {% endif %}
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/profile/?uid={{ request.user.id }}"><span
+                                            class="glyphicon glyphicon-home">&nbsp;我的主页</span></a>
+                                </li>
+                                <li>
+                                    <a href="#"><span
+                                            class="glyphicon glyphicon-envelope">&nbsp;我的私信</span></a>
+                                </li>
+                                <li>
+                                    <a id="logout" href="{% url 'user:logout' %}"><span class="glyphicon glyphicon-off">&nbsp;退出</span></a>
+                                </li>
+                            </ul>
+                            <li>
+                                <div>
+                                    <img width="50" height="50" class="img-responsive img-thumbnail"
+                                         src="{{ MEDIA_URL }}{{ request.user.image }}"/>
+                                </div>
+                            </li>
+                        {% else %}
+                            <a href="{% url 'user:login_reg' %}">请登录</a>
+                        {% endif %}
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</nav>
+<script>
+    $(document).ready(function () {
+        $('#searchButton').click(function () {
+            var string = $('#searchText').val();
+            $(window).attr('location', '/?searchText=' + string);
+        });
+    });
+</script>
+
+{% include 'ask_question.html' %}
+<br/> {% block main_content %}{% endblock %}
+</body>
+
+</html>

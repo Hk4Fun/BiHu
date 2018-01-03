@@ -1,0 +1,49 @@
+{% load staticfiles %}
+<form class="form-horizontal" role="form">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div>
+                <input id="username_login" type="text" class="form-control" placeholder="输入用户名"/>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
+            <div>
+                <input id="password_login" type="password" class="form-control" placeholder="输入密码"/>
+                <small id="tipsforlogin" class="text-danger"></small>
+            </div>
+
+        </div>
+    </div>
+    <button id="loginButton" type="button" class="btn btn-primary btn-lg btn-block">登录</button>
+</form>
+<script>
+    $(document).ready(function () {
+        $('#loginButton').click(function () {
+            $.ajax({
+                url: '{% url 'user:login_reg' %}',
+                type: 'POST',
+                data: {
+                    'username': $('#username_login').val(),
+                    'password': $('#password_login').val()
+                },
+                async: true,
+                beforeSend:function(xhr){
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data['status'] === 'success') {
+                        $(window).attr('location','{% url 'index' %}');
+                    }
+                    else if (data['status'] === 'failed') {
+                        $('#tipsforlogin').html(data['msg']);
+                    }
+                },
+                error: function () {
+                    alert('出现错误!')
+                }
+            });
+        });
+    });
+</script>
