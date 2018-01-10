@@ -18,9 +18,9 @@ class Question(models.Model):
     title = models.CharField(max_length=128, verbose_name='问题名')
     desc = models.TextField(max_length=256, verbose_name='问题描述')
     view_nums = models.IntegerField(default=0, verbose_name='浏览量')
-    asker = models.ForeignKey(User, related_name='askers', verbose_name='提问者')
+    asker = models.ForeignKey(User, related_name='questions', verbose_name='提问者')
     tags = models.ManyToManyField(Tag, verbose_name='标签')
-    concerned_users = models.ManyToManyField(User, verbose_name='被关注者')
+    concerned_users = models.ManyToManyField(User, verbose_name='关注者')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
 
     def likes(self):
@@ -43,8 +43,8 @@ class Article(models.Model):
     view_nums = models.IntegerField(default=0, verbose_name='浏览量')
     up_nums = models.IntegerField(default=0, verbose_name='点赞量')
     down_nums = models.IntegerField(default=0, verbose_name='踩量')
-    question = models.ForeignKey(Question, related_name='questions', verbose_name='问题')
-    author = models.ForeignKey(User, related_name='authors', verbose_name='作者')
+    question = models.ForeignKey(Question, related_name='articles', verbose_name='问题')
+    author = models.ForeignKey(User, related_name='articles', verbose_name='作者')
     collected_users = models.ManyToManyField(User, verbose_name='被收藏者')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
 
@@ -67,8 +67,8 @@ class Comment(models.Model):
     content = models.TextField(max_length=256, verbose_name='内容')
     up_nums = models.IntegerField(default=0, verbose_name='点赞量')
     down_nums = models.IntegerField(default=0, verbose_name='踩量')
-    reviewer = models.ForeignKey(User, related_name='reviewers', verbose_name='评论者')
-    article = models.ForeignKey(Article, related_name='articles', verbose_name='文章')
+    reviewer = models.ForeignKey(User, related_name='comments', verbose_name='评论者')
+    article = models.ForeignKey(Article, related_name='comments', verbose_name='文章')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='发表时间')
 
     class Meta:

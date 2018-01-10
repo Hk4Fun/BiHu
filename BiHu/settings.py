@@ -150,3 +150,9 @@ PAGINATION_SETTINGS = {
 }
 
 AUTH_USER_MODEL = 'users.User'
+
+# 自定义用户登录验证
+AUTHENTICATION_BACKENDS = [
+    'users.views.CustomBackend',
+
+]

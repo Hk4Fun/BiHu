@@ -22,9 +22,9 @@ def verify_phone(phone):
     phone_match = p2.match(phone)
     query = User.objects.filter(mobile=phone).values('mobile')
     if not phone_match:
-        msg = msg + '手机格式不对！'
+        msg = msg + '手机格式错误！'
     elif query:
-        msg = msg + '手机号已注册！'
+        msg = msg + '该手机号已注册！'
     phone_dic['phone'] = msg
     return phone_dic
 
@@ -41,8 +41,14 @@ def verify_pwd(pwd, pwd2):
 
 
 def verify_email(email):
+    msg = ''
+    email_dic = {}
     str = r'^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}$'
-    if re.match(str, email):
-        return 'ok'
-    else:
-        return 'error'
+    query = User.objects.filter(email=email).values('email')
+    if not re.match(str, email):
+        msg = msg + '邮箱格式错误！'
+    elif query:
+        msg = msg + '该邮箱已注册！'
+    email_dic['email'] = msg
+    return  email_dic
+

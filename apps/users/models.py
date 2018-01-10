@@ -11,6 +11,7 @@ class User(AbstractUser):
     image = models.ImageField(upload_to="user/image/%Y/%m/%d", default="user/image/default.jpg", verbose_name="头像")
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
     self_description = models.CharField(max_length=128, default='我什么都没写', verbose_name='一句话介绍')
+    pwd_input_wrong_times = models.IntegerField(default=0, verbose_name='修改密码错误次数')
     # follow = models.ManyToManyField('self', through='Follow', symmetrical=False, verbose_name='关注')
     # send_message = models.ManyToManyField('self', through='Message', symmetrical=False, verbose_name='发私信')
 

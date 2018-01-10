@@ -1,0 +1,60 @@
+{% load staticfiles %}
+<div class="collapse" id="collapseComment{{ i }}">
+    <div class="list-group" id="list_group{{ article.id }}">
+        {% for comment in article.comments.all %}
+            <a class="list-group-item ">
+                <div class="row">
+                    <div class="col-md-2">
+                        <img width="60" height="60" class="img-circle img-responsive img-thumbnail"
+                                         src="{{ MEDIA_URL }}{{ comment.reviewer.image }}"/>
+                    </div>
+                    <div class="col-md-7">
+                        {% if comment.reviewer.nickname %}
+                            <h4>{{ comment.reviewer.nickname }}</h4>
+                        {% else %}
+                            <h4>{{ comment.reviewer.username }}</h4>
+                        {% endif %}
+                        <p style="color: gray;">{{ comment.reviewer.self_description }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p>{{ comment.add_time|date:'M  j号 H:i' }}发表</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <h4>{{ comment.content }}</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-offset-1">
+                        <div class="praise">
+                            <span class="praiseParent"><img src="{% static 'img/zan.png' %}" id="praise-img"/></span>
+                            <span id="praise-txt">{{ comment.up_nums }}</span>
+                            <span id="add-num"><em>+1</em></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+
+    </div>
+    <div class="list-group">
+        <a class="list-group-item ">
+            <form>
+                <div class="row">
+                    <div class="col-md-10">
+                        <input type="text" id="comment{{ article.id }}" class="form-control" name="{{ article.id }}"
+                               placeholder="来吐槽吧！"/>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" name="submitComment" value="comment{{ article.id }}"
+                                class="btn btn-primary">提交评论
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </a>
+    </div>
+
+</div>
+

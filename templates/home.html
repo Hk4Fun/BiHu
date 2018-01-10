@@ -1,0 +1,392 @@
+{% extends 'headbar.html' %}
+{% load staticfiles %}
+{% load MyTags %}
+{% block main_content %}
+    <div class="container">
+        <div class="row ">
+            <div class="col-md-10 col-md-offset-1 well ">
+                <div class="col-md-12 column">
+                    <div class="row ">
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-primary ">{{ user.nickname }}</h3>
+                            <form id="AvatarForm" enctype="multipart/form-data" method="post"
+                                  action="{% url 'user:image_upload' %}">
+                                {% csrf_token %}
+                                <label for="avatarUp" class="up_img">
+                                    <img class="img-circle img-responsive img-thumbnail up_img" width="100"
+                                         height="100" style="cursor:pointer"
+                                         src="{{ MEDIA_URL }}{{ user.image }}"/>
+                                    <input type="file" name="image" id="avatarUp"/>
+                                </label>
+                            </form>
+                        </div>
+                        <div class="col-md-9 ">
+                            <div class="row ">
+                                <form class="form-horizontal">
+                                    <div class="col-md-4 column">
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <input id="nickname" type="text" class="form-control" placeholder="昵称"
+                                                       value="{{ user.nickname|default:'' }}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <textarea id="self_description" class="form-control" rows="1"
+                                                          placeholder="个性签名">{{ user.self_description|default:'' }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <input id="mobile" type="text" class="form-control" placeholder="手机号"
+                                                       value="{{ user.mobile|default:'' }}"/>
+                                                <small id="tipsforphone" class="text-danger"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 column">
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <input id="email" type="text" class="form-control" placeholder="邮箱"
+                                                       value="{{ user.email|default:'' }}"/>
+                                                <small id="tipsforemail" class="text-danger"></small>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <input id="oldPwd" type="password" class="form-control"
+                                                       placeholder="旧密码"/>
+                                                <small id="tipsforoldpwd" class="text-danger"></small>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <input id="newPwd" type="password" class="form-control"
+                                                       placeholder="新密码"/>
+                                                <small id="tipsfornewpwd" class="text-danger"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 column">
+                                        <div class="row">
+                                            <div class="col-xs-2 col-xs-offset-2">
+                                                <div class="form-group ">
+                                                    <div class="radio">
+                                                        <label><input type="radio" name="sex" value="male"
+                                                                {% ifequal user.gender 'male' %}
+                                                                      checked
+                                                                {% endifequal %}
+                                                        />男</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-2 col-xs-offset-2">
+                                                <div class="form-group ">
+                                                    <div class="radio">
+                                                        <label><input type="radio" name="sex" value="female"
+                                                                {% ifequal user.gender 'female' %}
+                                                                      checked
+                                                                {% endifequal %}
+                                                        />女</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% if user.id == request.user.id %}
+                                            <div class="row">
+                                                <div class="col-md-8 col-md-offset-2">
+                                                    <button class="btn btn-primary" type="button" id="resetChange">全部重置
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-top: 10%">
+                                                <div class="col-md-8 col-md-offset-2">
+                                                    <button class="btn btn-primary" type="button" id="submitChange">确认修改
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-1 well ">
+                <div class="tabbable" id="tabs-723316">
+                    <ul class="nav nav-pills">
+                        <li class="active">
+                            <a href="#ANS" data-toggle="tab">回答<span class="badge">{{ user.articles.all.count }}</span></a>
+                        </li>
+                        <li>
+                            <a href="#QUES" data-toggle="tab">提问<span
+                                    class="badge">{{ user.questions.all.count }}</span></a>
+                        </li>
+                        <li>
+                            <a href="#FOLLOWING" data-toggle="tab">
+                                {% if user.id == request.user.id %}
+                                    我关注谁
+                                {% elif user.gender == 'male' %}
+                                    他关注谁
+                                {% else %}
+                                    她关注谁
+                                {% endif %}<span class="badge">{{ user.followers.all.count }}</span></a>
+                        </li>
+                        <li>
+                            <a href="#FOLLOWED" data-toggle="tab">
+                                {% if user.id == request.user.id %}
+                                    谁关注我
+                                {% elif user.gender == 'male' %}
+                                    谁关注他
+                                {% else %}
+                                    谁关注她
+                                {% endif %}<span class="badge">{{ user.follows.all.count }}</span></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="ANS">
+                            <ul class="list-group">
+                                {% for article in user.articles.all %}
+                                    <li class="list-group-item">
+                                        <a href="{% url 'question:article' article.question_id %}"
+                                           class="list-group-item "
+                                           style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">{{ article.question.title }}
+                                            <br>
+                                            <small style="color: gray">{{ article.add_time|since }}</small>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                        <div class="tab-pane" id="QUES">
+                            <ul class="list-group">
+                                {% for question in user.questions.all %}
+                                    <li class="list-group-item">
+                                        <a href="{% url 'question:article' question.id %}" class="list-group-item "
+                                           style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">{{ question.title }}
+                                            <br>
+                                            <small style="color: gray">{{ question.add_time|since }}</small>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="tab-pane" id="FOLLOWING">
+                            {% for follow in user.followers.all %}
+                                <ul class="list-group">
+                                    <li class="list-group-item"
+                                        style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <a href="{% url 'user:home' follow.follow.id %}">
+                                                    <img class="img-circle img-responsive img-thumbnail"
+                                                         style="width: 60px"
+                                                         src="{{ MEDIA_URL }}{{ follow.follow.image }}"/>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <h4><a href="{% url 'user:home' follow.follow.id %}">
+                                                        {% if follow.follow.nickname %}{{ follow.follow.nickname }}
+                                                        {% else %}{{ follow.follow.username }}{% endif %}</a></h4>
+                                                </div>
+                                                <div class="row">
+                                                    <p style="color: gray">{{ follow.follow.self_description }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="row" style="margin-top: 15%;"></div>
+                                                {% if follow.follow in request.user.id|my_follows %}
+                                                    <button type="button" class="btn btn-primary" id="cancel" name="focus" value="{{ follow.follow.id }}">取消关注</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-primary" id="ok" name="focus" value="{{ follow.follow.id }}">关注</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="FOLLOWED">
+                            {% for follow in user.follows.all %}
+                                <ul class="list-group">
+                                    <li class="list-group-item"
+                                        style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <a href="{% url 'user:home' follow.follower.id %}">
+                                                    <img class="img-circle img-responsive img-thumbnail"
+                                                         style="width: 60px"
+                                                         src="{{ MEDIA_URL }}{{ follow.follower.image }}"/>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <h4><a href="{% url 'user:home' follow.follower.id %}">
+                                                        {% if follow.follower.nickname %}{{ follow.follower.nickname }}
+                                                        {% else %}{{ follow.follower.username }}{% endif %}</a></h4>
+                                                </div>
+                                                <div class="row">
+                                                    <p style="color: gray">{{ follow.follower.self_description }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="row" style="margin-top: 15%;"></div>
+                                                {% if follow.follower in request.user.id|my_follows %}
+                                                    <button type="button" class="btn btn-primary" id="cancel" name="focus" value="{{ follow.follower.id }}">取消关注</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-primary" id="ok" name="focus" value="{{ follow.follower.id }}">关注</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                </ul>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            //建立一個可存取到該file的url
+            function getObjectURL(file) {
+                var url = null;
+                if (window.createObjectURL !== undefined) { // basic
+                    url = window.createObjectURL(file);
+                } else if (window.URL !== undefined) { // mozilla(firefox)
+                    url = window.URL.createObjectURL(file);
+                } else if (window.webkitURL !== undefined) { // webkit or chrome
+                    url = window.webkitURL.createObjectURL(file);
+                }
+                return url;
+            }
+
+            //获取点击的图片元素
+            {#var cdimg = $('.up_img').children('img');#}
+            //获取上传图片的 input 标签元素
+            var cdfile = $('.up_img').children('input[type="file"]');
+            //设置input 大小和图片一致
+            {#cdfile.css({'width': cdimg.css('width'), 'height': cdimg.css('height')});#}
+            //input透明度为0,定位，优先级比图片高
+            cdfile.css({'opacity': 0, 'position': 'absolute', 'z-index': 10});
+            //判断input的图片文件改变则img的图片也替换为input选择的图片
+            cdfile.change(function () {
+                if (this.files && this.files[0]) {
+                    var objUrl = getObjectURL(this.files[0]);
+                    if (objUrl) {
+                        $(this).siblings('img').attr("src", objUrl);
+                        $("#AvatarForm").submit()
+                    }
+                }
+            });
+        });
+
+        $("#AvatarForm").submit(function () {
+            $(this).ajaxSubmit({
+                type: 'POST',
+
+                url: '{% url 'user:image_upload' %}',
+                success: function (data) {
+                    if (data['status'] === 'success') {
+                        alert('图片上传成功！')
+                    }
+                    else if (data['status'] === 'fail') {
+                        alert('图片上传错误！')
+                    }
+                    $(window).attr('location', '{% url 'user:home' request.user.id %}');
+
+                },
+                error: function () {
+                    alert("发生错误！");
+                }
+            });
+        });
+
+        $('#submitChange').click(function () {
+            $.ajax({
+                url: '{% url 'user:home' request.user.id %}',
+                type: 'post',
+                async: true,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                data: {
+                    'nickname': $('#nickname').val(),
+                    'self_description': $('#self_description').val(),
+                    'mobile': $('#mobile').val(),
+                    'email': $('#email').val(),
+                    'oldPwd': $('#oldPwd').val(),
+                    'newPwd': $('#newPwd').val(),
+                    'sex': $('input[type="radio"]:checked').val()
+                },
+                success: function (data) {
+                    if (data.status === 'success') {
+                        $(window).attr('location', '{% url 'user:home' request.user.id %}');
+                    }
+                    else if (data.redirect) {
+                        $(window).attr('location', '{% url 'user:login_reg' %}');
+                    }
+                    else if (data.oldPwd) {
+                        $('#tipsforoldpwd').html(data.oldPwd);
+                    }
+                    else if (data.newPwd) {
+                        $('#tipsfornewpwd').html(data.newPwd);
+                    }
+                    else if (data.phone) {
+                        $('#tipsforphone').html(data.phone);
+                    }
+                    else if (data.email) {
+                        $('#tipsforemail').html(data.email);
+                    }
+                },
+                error: function () {
+                    alert('出现错误!');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('button[name="focus"]').click(function () {
+                var focusObject = $(this);
+                $.ajax({
+                    url: '{% url "user:follow" %}',
+                    type: 'get',
+                    dataType: 'text',
+                    data: {
+                        'follower_id': {{ request.user.id|default:'-1' }},
+                        'followee_id': focusObject.val(),
+                        'follow_tip': focusObject.attr('id')
+                    },
+                    success: function (data) {
+                        if (data === 'canceled') {
+                            focusObject.html('关注');
+                            focusObject.attr('id', 'ok')
+                        }
+                        else if (data === 'focused') {
+                            focusObject.html("取消关注");
+                            focusObject.attr('id', 'cancel')
+                        }
+                        else if (data === 'redirect') {
+                            $(window).attr('location', '{% url 'user:login_reg' %}');
+                        }
+                    },
+                    error: function () {
+                        alert('出现错误!');
+                    }
+                });
+            });
+        });
+
+    </script>
+{% endblock %}

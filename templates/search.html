@@ -1,0 +1,83 @@
+{% extends 'index_search_base.html' %}
+{% load staticfiles %}
+{% load MyTags %}
+
+
+{% block question_list %}
+    <span class="glyphicon glyphicon-list-alt" style="margin-bottom: 20px">&nbsp;<strong>搜索结果</strong></span>
+    {% for question in questions.object_list %}
+        <div class="alert alert-info-jerry ">
+            <div class="row">
+                <div class="col-md-2">
+                    <a href="{% url 'user:home' question.asker.id %}">
+                        <img class="img-circle img-responsive img-thumbnail"
+                             src="{{ MEDIA_URL }}{{ question.asker.image }}"/>
+                    </a>
+                </div>
+                <div class="col-md-9 ">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <a href="{% url 'user:home' question.asker.id %}">
+                                <h4>
+                                    {% if  question.asker.nickname %}
+                                        {{ question.asker.nickname }}
+                                    {% else %}
+                                        {{ question.asker.username }}
+                                    {% endif %}
+                                </h4>
+                            </a>
+                        </div>
+                        <div class="col-md-5">
+                            <span style="color: gray">提出了问题 · {{ question.add_time|since }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>{{ question.asker.self_description }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="{% url 'question:article' question.id %}"><h3>{{ question.title }}</h3>
+                    </a>
+                </div>
+            </div>
+            {{ question.desc }}
+            <hr/>
+            <h4>
+                {% load humanize %}
+                <span class="glyphicon glyphicon-heart"><code>{{ question.concerned_users.all.count }}</code>&nbsp;</span>
+                <span class="glyphicon glyphicon-calendar"><code>{{ question.add_time|date:'Y年 M  j号  D' }}</code>&nbsp;</span>
+            </h4>
+        </div>
+    {% endfor %}
+
+    <div class="text-center">
+        <ul class="pager">
+            {% if questions.has_previous %}
+                <li><a
+                        href="?{{ questions.previous_page_number.querystring }}">上一页</a></li>
+            {% endif %}
+            {% for page in questions.pages %}
+                {% if page %}
+                    {% ifequal page questions.number %}
+                        <li><a style="background-color: #5bc0de;color: #0f0f0f">{{ page }}</a></li>
+                    {% else %}
+                        <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                    {% endifequal %}
+                {% else %}
+                    <li>...</li>
+                {% endif %}
+            {% endfor %}
+            {% if questions.has_next %}
+                <li><a href="?{{ questions.next_page_number.querystring }}">下一页</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}

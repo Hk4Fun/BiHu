@@ -1,0 +1,70 @@
+{% load staticfiles %}
+<div class="modal fade" id="myModal" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">提问</h4>
+            </div>
+            <div class="modal-body">
+
+                <form>
+                    <div class="form-group">
+                        <label for="recipient-name" class="control-label">问题名:</label>
+                        <input type="text" class="form-control" id="question_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient-name" class="control-label">问题描述:</label>
+                        <textarea class="form-control" rows="5" placeholder="请简洁的描述问题" id="question_description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">添加标签:</label>
+                        <input type="text" class="form-control" id="question_tag" placeholder="标签之间按 空格 分离" />
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="question_submit">确认添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#question_submit').click(function () {
+            //alert($('#question_name').val()+$('#question_description').val()+$('#question_tag').val())
+            $.ajax({
+                url: "{% url 'question:ask' %}",
+                type: "post",
+                cache: false,
+                async: true,
+                beforeSend:function(xhr){
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                data: {
+                    "question_name": $('#question_name').val(),
+                    "question_description": $('#question_description').val(),
+                    "question_tag": $('#question_tag').val()
+                },
+                success: function (data) {
+                    if (data.status === 'success') {
+                        $('#myModal').modal('hide');
+                        window.location.href="{% url 'index' %}";
+                    }
+                    else if(data.status === 'failed'){
+                        $('#myModal').modal('hide');
+                        window.location.href="{% url 'user:login_reg' %}";
+                    }
+                },
+                error: function () {
+                    alert('出现错误!')
+                }
+            });
+        });
+    });
+
+</script>

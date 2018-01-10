@@ -1,0 +1,107 @@
+{% extends 'headbar.html' %}
+{% load staticfiles %}
+{% block main_content %}
+
+    <link href="{% static 'js/kindeditor-4.1.10/themes/default/default.css' %}" rel="stylesheet">
+    <script src="{% static 'js/kindeditor-4.1.10/kindeditor-all-min.js' %}"></script>
+    <script src="{% static 'js/kindeditor-4.1.10/lang/zh_CN.js' %}"></script>
+    <script>
+        var editor;
+        KindEditor.ready(function (K) {
+            editor = K.create('textarea[name="content"]', {
+                resizeType: 1,
+                allowPreviewEmoticons: false,
+                //
+                <!--去掉远程上传的功能-->
+                allowImageRemote: false,
+                width: '100%',
+                height: '500px',
+                uploadJson: '{% url 'question:upload' 'editor' %}',
+                afterBlur: function () {
+                    this.sync();
+                },
+                extraFileUploadParams:{
+                    "csrfmiddlewaretoken":"{{ csrf_token }}"
+                },
+                afterUpload : function(url, data, name) { //上传文件后执行的回调函数，必须为3个参数
+                    if(name==="image" || name==="multiimage"){ //单个和批量上传图片时
+                        var img = new Image(); img.src = url;
+                        img.onload = function(){ //图片必须加载完成才能获取尺寸
+                        if(img.width>700) editor.html(editor.html().replace('<img src="' + url + '"','<img src="' + url + '" width="700"'))
+                        }
+                    }
+                }
+            });
+        })
+
+    </script>
+
+    <div class="container">
+        <div class="well">
+            <div class="row">
+                <div class="col-md-7 col-md-offset-2">
+                    <div class="table-responsive">
+                        <table class="table-condensed">
+                            <tr>
+                                {% for tag in question.tags.all %}
+                                    <td>
+                                        <h4><span
+                                                class="label {% cycle 'label-info'  'label-warning' 'label-primary'  'label-success' 'label-danger' %}">{{ tag.name }}
+                                            </span>
+                                        </h4>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    </div>
+                    <h3 id="tags" style="color: #2aabd2">{{ question.title }}</h3>
+                    <br>
+                    <h4 style="color:gray"> {{ question.desc }}</h4>
+                </div>
+
+            </div>
+        </div>
+        <hr>
+        <div class="well">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-1">
+                    <textarea id="editor_id" name="content" class="form-control" rows="4">
+                           {% autoescape off %}
+                               {{ article.content }}
+                           {% endautoescape %}
+                    </textarea>
+                </div>
+                <div class="col-md-1 col-md-offset-1">
+                    <button id='saveReply' type="button" class="btn btn-primary">保存提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#saveReply').click(function () {
+                $.ajax({
+                    url: '{% url "question:answer" question.id %}',
+                    type: 'post',
+                    dataType: 'text',
+                    async: true,
+                    beforeSend:function(xhr){
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    data: {
+                        'article_content': $('#editor_id').val()
+                    },
+                    success: function (data) {
+                        $(window).attr('location', '{% url 'question:article' question.id %}');
+                    },
+                    error: function () {
+                        alert('出现错误!')
+                    }
+                });
+
+            });
+        });
+
+    </script>
+{% endblock %}

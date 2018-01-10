@@ -1,0 +1,94 @@
+{% extends 'headbar.html' %}
+{% load staticfiles %}
+{% block main_content %}
+    <div class="container">
+        <div class="row ">
+            <div class="col-md-8  well">
+                {% block question_list %}{% endblock %}
+            </div>
+            <div class="col-md-4  ">
+                <div class="row well">
+                    <div class="col-md-10">
+                        <span class="glyphicon glyphicon-list-alt"
+                              style="margin-bottom: 20px">&nbsp;<strong>关于我</strong></span>
+                        {% if request.user.is_authenticated %}
+                            <div class="list-group">
+                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item active">我的提问<span
+                                        class="badge">{{ request.user.questions.count }}</span></a>
+                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item">我的回答<span
+                                        class="badge">{{ request.user.articles.count }}</span></a>
+                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item">我的评论<span
+                                        class="badge">{{ request.user.comments.count }}</span></a>
+                            </div>
+                        {% else %}
+                            <div class="list-group">
+                                <a href="#" class="list-group-item active">我的提问<span
+                                        class="badge">0</span></a>
+                                <a href="#" class="list-group-item">我的回答<span
+                                        class="badge">0</span></a>
+                                <a href="#" class="list-group-item">我的评论<span
+                                        class="badge">0</span></a>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+                <div class="row well">
+                    <div class="col-md-10 ">
+                        <div class="row">
+                            <div class=" col-md-offset-1">
+                                <ul class="nav nav-pills">
+                                    <li class="active">
+                                        <a href="#NewQues" id="NewQues-tab" data-toggle="tab">最新提问</a>
+                                    </li>
+                                    <li>
+                                        <a href="#MostLikes" id="MostLikes-tab" data-toggle="tab">最多关注</a>
+                                    </li>
+                                    <li>
+                                        <a href="#MostReply" id="MostReply-tab" data-toggle="tab">最多回答</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="tab-content">
+                            <div class="tab-pane fade active in" id="NewQues">
+                                <div class="list-group">
+                                    {% for newq in NewQues %}
+                                        <a href="{% url 'question:article' newq.id %}" class="list-group-item "
+                                           style="background-color:{% cycle '#f2dede'  '#fcf8e3' '#d9edf7' %};">{{ newq.title }}
+                                            <br>
+                                            <small style="color: gray">{{ newq.add_time|date:'M  j号 Y年' }}</small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="MostLikes">
+                                <div class="list-group">
+                                    {% for like in MostLikes %}
+                                        <a href="{% url 'question:article' like.id %}" class="list-group-item "
+                                           style="background-color:{% cycle '#f2dede'  '#fcf8e3' '#d9edf7' %};">{{ like.title }}
+                                            <br>
+                                            <small style="color: gray">{{ like.likes }}人关注</small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="MostReply">
+                                <div class="list-group">
+                                    {% for question in MostReply %}
+                                        <a href="{% url 'question:article' question.id %}" class="list-group-item "
+                                           style="background-color:{% cycle '#f2dede'  '#fcf8e3' '#d9edf7' %};">{{ question.title }}
+                                            <br>
+                                            <small style="color: gray">{{ question.articles.count }}个回答</small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

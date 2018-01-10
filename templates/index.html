@@ -1,74 +1,137 @@
-{% extends 'headbar.html' %}
+{% extends 'index_search_base.html' %}
 {% load staticfiles %}
-{% block main_content %}
-		<div class="container">
-			<div class="row ">
-				<div class="col-md-8  well">
-					<span class="glyphicon glyphicon-list-alt">&nbsp;<strong>最新动态</strong></span>
-{#					{% include 'article_simplified.html' %}#}
+{% load MyTags %}
 
-				</div>
-				<div class="col-md-4  ">
-					<div class="row well">
-						<div class="col-md-10">
-							<span class="glyphicon glyphicon-list-alt">&nbsp;<strong>关于我</strong></span>
-							<div class="list-group">
-								<a href="#" class="list-group-item active">我的评论<span class="badge">14</span></a>
-								<a href="#" class="list-group-item">我的文章<span class="badge">8</span></a>
-								<a href="#" class="list-group-item">我的收藏<span class="badge">5</span></a>
-							</div>
-						</div>
-					</div>
-					<div class="row well">
-						<div class="col-md-10 ">
-							<div class="row">
-								<div class=" col-md-offset-1">
-									<ul class="nav nav-pills">
-										<li class="active">
-											<a href="#NewQues" id="NewQues-tab" data-toggle="tab">最新提问</a>
-										</li>
-										<li>
-											<a href="#MostLikes" id="MostLikes-tab" data-toggle="tab">最多喜爱</a>
-										</li>
-										<li>
-											<a href="#MostReply" id="MostReply-tab" data-toggle="tab">最多回答</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-							<br />
-							<div class="tab-content">
-								<div class="tab-pane fade active in" id="NewQues">
-									<div class="list-group">
-                                        {% for newq in NewQues %}
-										<a href="/article/?qid={{ newq.id }}" class="list-group-item " style="background-color:{% cycle '#f2dede'  '#fcf8e3' '#d9edf7' %};">{{ newq.title }}
-                                            <br><small style="color: gray">{{ newq.date_publish|date:'M  j号 Y年' }}</small>
-                                        </a>
-									    {% endfor %}
-                                    </div>
-								</div>
-								<div class="tab-pane fade " id="MostLikes">
-									<div class="list-group">
-										{% for like in MostLikes %}
-										<a href="/article/?qid={{ like.id }}" class="list-group-item " style="background-color:{% cycle '#f2dede'  '#fcf8e3' '#d9edf7' %};">{{ like.title }}
-                                            <br><small style="color: gray">{{ like.likes }}个喜爱</small>
-                                        </a>
-									    {% endfor %}
-									</div>
-								</div>
-								<div class="tab-pane fade " id="MostReply">
-									<div class="list-group">
-										{% for reply in MostReply %}
-										<a href="/article/?qid={{ reply.id }}" class="list-group-item " style="background-color:{% cycle '#f2dede'  '#fcf8e3' '#d9edf7' %};">{{ reply.title }}
-                                            <br><small style="color: gray">{{ reply.count }}个回答</small>
-                                        </a>
-									    {% endfor %}
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+
+{% block question_list %}
+    <span class="glyphicon glyphicon-list-alt" style="margin-bottom: 20px">&nbsp;<strong>最新动态</strong></span>
+    {% for qa in QA.object_list %}
+        {% if qa.type == 'q' %}
+            <div class="alert alert-info-jerry ">
+                <div class="row">
+                    <div class="col-md-2">
+                        <a href="{% url 'user:home' qa.asker.id %}">
+                            <img class="img-circle img-responsive img-thumbnail"
+                                 src="{{ MEDIA_URL }}{{ qa.asker.image }}"/>
+                        </a>
+                    </div>
+                    <div class="col-md-9 ">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <a href="{% url 'user:home' qa.asker.id %}">
+                                    <h4>
+                                        {% if  qa.asker.nickname %}
+                                            {{ qa.asker.nickname }}
+                                        {% else %}
+                                            {{ qa.asker.username }}
+                                        {% endif %}
+                                    </h4>
+                                </a>
+                            </div>
+                            <div class="col-md-5">
+                                <span style="color: gray">提出了问题 · {{ qa.add_time|since }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>{{ qa.asker.self_description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="{% url 'question:article' qa.id %}"><h3>{{ qa.title }}</h3>
+                        </a>
+                    </div>
+                </div>
+                {{ qa.desc }}
+                <hr/>
+                <h4>
+                    {% load humanize %}
+                    <span class="glyphicon glyphicon-heart"><code>{{ qa.concerned_users.all.count }}</code>&nbsp;</span>
+                    <span class="glyphicon glyphicon-calendar"><code>{{ qa.add_time|date:'Y年 M  j号  D' }}</code>&nbsp;</span>
+                </h4>
+            </div>
+        {% else %}
+            <div class="alert alert-info-jerry ">
+                <div class="row">
+                    <div class="col-md-2">
+                        <a href="{% url 'user:home' qa.author.id %}">
+                            <img class="img-circle img-responsive img-thumbnail"
+                                 src="{{ MEDIA_URL }}{{ qa.author.image }}"/>
+                        </a>
+                    </div>
+                    <div class="col-md-9 ">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <a href="{% url 'user:home' qa.author.id %}">
+                                    <h4>
+                                        {% if  qa.author.nickname %}
+                                            {{ qa.author.nickname }}
+                                        {% else %}
+                                            {{ qa.author.username }}
+                                        {% endif %}
+                                    </h4>
+                                </a>
+                            </div>
+                            <div class="col-md-5">
+                                <span style="color: gray">回答了问题 · {{ qa.add_time|since }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>{{ qa.author.self_description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="{% url 'question:article' qa.question_id %}">
+                            <h3>{{ qa.question.title }}</h3></a>
+                    </div>
+                </div>
+                {% autoescape off %}
+                    {{ qa.content|truncatewords_html:10 }}
+                {% endautoescape %}
+                <hr/>
+                <h4>
+                    {% load humanize %}
+                    <span class="glyphicon glyphicon-heart"><code>{{ qa.collected_users.all.count }}</code>&nbsp;</span>
+                    <span class="glyphicon glyphicon-calendar"><code>{{ qa.add_time|date:'Y年 M  j号  D' }}</code>&nbsp;</span>
+                </h4>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <div class="text-center">
+        <ul class="pager">
+            {% if QA.has_previous %}
+                <li><a
+                        href="?{{ QA.previous_page_number.querystring }}">上一页</a></li>
+            {% endif %}
+            {% for page in QA.pages %}
+                {% if page %}
+                    {% ifequal page QA.number %}
+                        <li><a style="background-color: #5bc0de;color: #0f0f0f">{{ page }}</a></li>
+                    {% else %}
+                        <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                    {% endifequal %}
+                {% else %}
+                    <li>...</li>
+                {% endif %}
+            {% endfor %}
+            {% if QA.has_next %}
+                <li><a href="?{{ QA.next_page_number.querystring }}">下一页</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
 {% endblock %}

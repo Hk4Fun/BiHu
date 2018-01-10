@@ -19,12 +19,13 @@
 
             </div>
             <div class="collapse navbar-collapse navbar-responsive-collapse">
-                <form class="navbar-form navbar-left">
+                <form class="navbar-form navbar-left" action="{% url 'question:search' %}" method="get">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <input id="searchText" type="text" value="{{ searchStr|default:"" }}" class="form-control"
-                               size="50" placeholder="搜索你感兴趣的问题或标签"/>
+                        <input id="searchText" type="text" value="{{ searchText|default:"" }}" class="form-control"
+                               size="60" placeholder="搜索你感兴趣的问题或话题标签" name="searchText"/>
                     </div>
-                    <button type="button" id="searchButton" class="btn btn-primary">
+                    <button type="submit" id="searchButton" class="btn btn-primary">
                         <span class="glyphicon glyphicon-search"></span>
                     </button>
                 </form>
@@ -44,14 +45,6 @@
                         <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal"
                                 data-target="#myModal">提问
                         </button>
-
-                    </li>
-
-                    {#                    <li>#}
-                    {#                        <a href="{% url 'answer' %}" class="navbar-link" style="color: #337ab7;font-size: 18px;">回答#}
-                    {#                        </a>#}
-                    {#                    </li>#}
-                    <li>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </li>
                     <li>
@@ -66,7 +59,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="/profile/?uid={{ request.user.id }}"><span
+                                    <a href="{% url 'user:home' request.user.id %}"><span
                                             class="glyphicon glyphicon-home">&nbsp;我的主页</span></a>
                                 </li>
                                 <li>
@@ -79,12 +72,16 @@
                             </ul>
                             <li>
                                 <div>
-                                    <img width="50" height="50" class="img-responsive img-thumbnail"
+                                    <a href="{% url 'user:home' request.user.id %}">
+                                        <img width="60" height="60" class="img-circle img-responsive img-thumbnail"
                                          src="{{ MEDIA_URL }}{{ request.user.image }}"/>
+                                    </a>
                                 </div>
                             </li>
                         {% else %}
-                            <a href="{% url 'user:login_reg' %}">请登录</a>
+                            <a href="{% url 'user:login_reg' %}" style="padding-top: 7.5px; padding-bottom: 7px">
+                                <button type="button" class="btn btn-danger" >请登录</button>
+                            </a>
                         {% endif %}
                 </ul>
 
@@ -92,14 +89,6 @@
         </div>
     </div>
 </nav>
-<script>
-    $(document).ready(function () {
-        $('#searchButton').click(function () {
-            var string = $('#searchText').val();
-            $(window).attr('location', '/?searchText=' + string);
-        });
-    });
-</script>
 
 {% include 'ask_question.html' %}
 <br/> {% block main_content %}{% endblock %}
