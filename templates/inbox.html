@@ -11,26 +11,27 @@
 
         {% for message in message_list %}
             <div class="row
-        {% if message.from_user_id == client.id %}
+        {% if message.from_user_id == request.user.id %}
                alert alert-info
-        {% elif message.to_user_id == client.id %}
+        {% elif message.to_user_id == request.user.id %}
                alert alert-success
         {% endif %}
       ">
                 <div class="col-md-2 alert">
-                    {% autoescape off %}
-                    {{message.from_user.profile}}
-                {% endautoescape %}
+                    <a href="{% url 'user:home' message.from_user_id %}">
+                        <img class="img-circle img-responsive img-thumbnail"
+                             src="{{ MEDIA_URL }}{{ message.from_user.image }}"/>
+                    </a>
                 </div>
                 <div class="col-md-10">
                     <div class="row">
-                        {% if message.from_user_id == client.id %}
+                        {% if message.from_user_id == request.user.id %}
                             <h4>
-                                你&nbsp;&nbsp;&nbsp;回复:&nbsp;&nbsp;&nbsp;{{ message.to_user.nickname }}
+                                你&nbsp;&nbsp;&nbsp;回复:&nbsp;&nbsp;&nbsp;{{ message.to_user.nickname|default:message.to_user.username }}
                             </h4>
-                        {% elif message.to_user_id == client.id %}
+                        {% elif message.to_user_id == request.user.id %}
                             <h4>
-                                {{ message.from_user.nickname }}&nbsp;&nbsp;&nbsp;回复:&nbsp;&nbsp;&nbsp;你
+                                {{ message.from_user.nickname|default:message.from_user.username }}&nbsp;&nbsp;&nbsp;回复:&nbsp;&nbsp;&nbsp;你
                             </h4>
                         {% endif %}
                     </div>
@@ -42,19 +43,19 @@
                     <div class="row">
                         <div class="col-md-3">
                             <p style="color: gray">
-                                {# 2月20日 12:26#}
-                                {{ message.date_publish|date:'M j日 G:i' }}
+                                {{ message.add_time|date:'M j日 G:i' }}
                             </p>
                         </div>
                         <div class="col-md-3 col-md-offset-6 text-center">
                             <button name="reply" type="button" class="btn btn-primary" data-toggle="modal"
 
-                                    {% if message.from_user_id == client.id %}
-                                    userId="{{ message.to_user_id }}" who="{{ message.to_user.nickname }}"
-                                    {% elif message.to_user_id == client.id %}
-                                    userId="{{ message.from_user_id }}" who="{{ message.from_user.nickname }}"
+                                    {% if message.from_user_id == request.user.id %}
+                                    userId="{{ message.to_user_id }}"
+                                    who="{{ message.to_user.nickname|default:message.to_user.username }}"
+                                    {% elif message.to_user_id == request.user.id %}
+                                    userId="{{ message.from_user_id }}"
+                                    who="{{ message.from_user.nickname|default:message.from_user.username }}"
                                     {% endif %}
-                                    clientId="{{ client.id }}"
                             >回复
                             </button>
                         </div>
@@ -66,41 +67,56 @@
     </div>
     {% include 'leave_message.html' %}
     <script>
-        $(document).ready(function () {
-            var to_user_id;
-            var from_user_id;
-            var who;
+        $(function () {
             $('button[name="reply"]').click(function () {
-                to_user_id = $(this).attr('userId');
-                 who = $(this).attr('who');
-                from_user_id = $(this).attr('clientId');
+                var messageObject = $(this);
+                var userId = messageObject.attr('userId');
+                var who = messageObject.attr('who');
                 $('#messsage_to').html('回复给: ' + who);
                 $('#leave_message').modal();
-            });
-            $('#sendTo').click(function () {
-                $.ajax({
-                    url: '{% url 'inbox' %}',
-                    type: 'get',
-                    dataType: 'text',
-                    data: {
-                        'from_id': from_user_id,
-                        'm_text': $('#message_text').val(),
-                        'to_id': to_user_id
-                    },
-                    success: function (responseText) {
-
-                        if (responseText == 'ok') {
-                            var string = '<div class="row alert alert-danger"><div class="col-md-2 alert"> <img src="/uploads/default/zhi.jpg" width="100" class="img-responsive img-thumbnail"/></div><div class="col-md-10"><div class="row"><h4> 我 回复:  '+who+'</h4></div><div class="row"><p style="font-size: medium"> '+$('#message_text').val()+'</p></div><div class="row"> <div class="col-md-3"> <p style="color: gray">刚刚 </p></div><div class="col-md-3 col-md-offset-6 text-center">  <button name="reply" type="button" class="btn btn-primary" data-toggle="modal"  >已回复</button></div> </div> </div></div>'
-                            $('#inboxBody').prepend(string)
-                            $('#leave_message').modal('hide')
+                $('#sendTo').unbind('click');  //在click中再绑定click，多重绑定,所以先取消
+                $('#sendTo').click(function () {
+                    $.ajax({
+                        url: "{% url 'user:message' %}",
+                        type: 'post',
+                        dataType: 'text',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        data: {
+                            'from_user_id': {{ request.user.id }},
+                            'message_text': $('#message_text').val(),
+                            'to_user_id': userId
+                        },
+                        success: function (data) {
+                            if (data === 'ok') {
+                                var string = '<p class="text-center text-primary" id="sendTips" style="font-size:20px;" ><strong>发送成功~</strong></p>';
+                                $('#privateMessageBody').append(string).delay('slow').fadeIn();
+                            }
+                            else if (data === 'fail') { //查无此人
+                                var string = '<p class="text-center text-danger" id="sendTips" style="font-size:20px;" ><strong>发送失败！</strong></p>';
+                                $('#privateMessageBody').append(string).delay('slow').fadeIn();
+                            }
+                            else if (data === 'redirect') { //未登录
+                                $(window).attr('location', '{% url 'user:login_reg' %}');
+                            }
+                        },
+                        error: function () {
+                            alert('出现错误!');
                         }
-                    },
-                    error: function () {
-                        alert('出现错误!');
-                    }
+                    });
                 });
+
             });
         });
+
+        $(function () {  //监听madal的关闭, 刷新页面
+            $('#leave_message').on('hide.bs.modal', function () {
+                if ($("#sendTips").length > 0) {//判断是否发送私信，有的话就刷新
+                    $(window).attr('location', '{% url 'user:message' %}');
+                }
+            })
+        })
 
 
     </script>

@@ -97,7 +97,7 @@
                                         {% if user.id == request.user.id %}
                                             <div class="row">
                                                 <div class="col-md-8 col-md-offset-2">
-                                                    <button class="btn btn-primary" type="button" id="resetChange">全部重置
+                                                    <button class="btn btn-primary" type="button" id="clearAll">全部清空
                                                     </button>
                                                 </div>
                                             </div>
@@ -376,6 +376,7 @@
                         else if (data === 'focused') {
                             focusObject.html("取消关注");
                             focusObject.attr('id', 'cancel')
+
                         }
                         else if (data === 'redirect') {
                             $(window).attr('location', '{% url 'user:login_reg' %}');
@@ -386,7 +387,18 @@
                     }
                 });
             });
+
+            $('#clearAll').click(function () {
+                $('#nickname').val('');
+                $('#self_description').val('');
+                $('#mobile').val('');
+                $('#email').val('');
+                $('#oldPwd').val('');
+                $('#newPwd').val();
+            })
         });
+
+
 
     </script>
 {% endblock %}

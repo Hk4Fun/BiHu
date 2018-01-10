@@ -87,6 +87,8 @@ class UploadEditorImageView(View):
         # {"error": 1, "message": "出错信息"}
         # {"error": 0, "url": "图片地址"}
         ##################
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('user:login_reg'))
         result = {"error": 1, "message": "上传出错！"}
         files = request.FILES.get("imgFile", None)
         if files:
@@ -114,3 +116,56 @@ class SearchView(View):
             MostLikes = Question.objects.annotate(likes=Count('concerned_users')).order_by('-likes')[:5]  # 最多关注
             MostReply = Question.objects.annotate(count=Count('articles')).order_by('-count')[:5]  # 最多回答
             return render(request, 'search.html', locals())
+
+
+class CommentView(View):
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponse('redirect')
+        comment_content = request.POST.get('comment_content', '')
+        article_id = request.POST.get('article_id', '')
+        if comment_content and article_id:
+            comment = Comment()
+            comment.reviewer = request.user
+            comment.content = comment_content
+            comment.article = Article.objects.get(id=article_id)
+            comment.save()
+            return HttpResponse('ok')
+
+class ThumbUpView(View):
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponse('redirect')
+        article_id = request.POST.get('article_id','')
+        comment_id = request.POST.get('comment_id','')
+        action = request.POST.get('action', '')
+        if article_id and action:  # 给文章点赞或取消赞
+            articles = Article.objects.filter(id=article_id)
+            if articles:
+                if action == 'ok':
+                    articles[0].up_nums += 1
+                    articles[0].save()
+                    return HttpResponse('success')
+                elif action == 'cancel':
+                    articles[0].up_nums -= 1
+                    articles[0].save()
+                    return HttpResponse('success')
+        elif comment_id and action: # 给评论点赞获取消赞
+            comments = Comment.objects.filter(id=comment_id)
+            if comments:
+                if action == 'ok':
+                    comments[0].up_nums += 1
+                    comments[0].save()
+                    return HttpResponse('success')
+                elif action == 'cancel':
+                    comments[0].up_nums -= 1
+                    comments[0].save()
+                    return HttpResponse('success')
+
+        return HttpResponse('fail')
+
+
+class ThumbDownView(View):
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponse('redirect')

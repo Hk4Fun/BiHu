@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load MyTags %}
 <!DOCTYPE html>
 <html>
 
@@ -50,11 +51,7 @@
                     <li>
                         {% if request.user.is_authenticated %}
                             <a href="" class="dropdown-toggle " data-toggle="dropdown">
-                                {% if request.user.nickname %}
-                                    <b>{{ request.user.nickname }}</b>
-                                {% else %}
-                                    <b>{{ request.user.username }}</b>
-                                {% endif %}
+                                <strong>{{ request.user.nickname|default:request.user.username}}</strong>
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
@@ -63,8 +60,9 @@
                                             class="glyphicon glyphicon-home">&nbsp;我的主页</span></a>
                                 </li>
                                 <li>
-                                    <a href="#"><span
-                                            class="glyphicon glyphicon-envelope">&nbsp;我的私信</span></a>
+                                    <a href="{% url 'user:message' %}"><span
+                                            class="glyphicon glyphicon-envelope">&nbsp;我的私信 <span
+                                        class="badge" style="margin-bottom: 5px; padding-bottom: 5px">{% unread_message_num request.user.id %}</span></span></a>
                                 </li>
                                 <li>
                                     <a id="logout" href="{% url 'user:logout' %}"><span class="glyphicon glyphicon-off">&nbsp;退出</span></a>

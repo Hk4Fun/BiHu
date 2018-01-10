@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 {% else %}
-                    <div class="row">
+                    <div class="row praise_include">
                         {% for article in question.articles.all|dictsortreversed:'add_time' %}
                             {% with i=forloop.counter %}
                                 <div class="row">
@@ -85,34 +85,36 @@
                                     </div>
                                     <div class="col-md-7">
                                         <a href="{% url 'user:home' article.author.id %}">
-                                            {% if article.author.nickname %}
-                                                <h4>{{ article.author.nickname }}</h4>
-                                            {% else %}
-                                                <h4>{{ article.author.username }}</h4>
-                                            {% endif %}
+                                            <h4>{{ article.author.nickname|default:article.author.username }}</h4>
                                         </a>
                                         <p style="color: gray">{{ article.author.self_description }}</p>
                                     </div>
-                                    <div class="col-md-3">
-                                        {% if article.author in request.user.id|my_follows %}
-                                            <button name="focus" id="cancel" type="button" class="btn btn-primary"
-                                                    value="{{ article.author.id }}">
-                                                取消关注
-                                            </button>
-                                        {% else %}
-                                            <button name="focus" id="ok" type="button" class="btn btn-primary"
-                                                    data-placement="top" data-toggle="popover" data-trigger="focus"
-                                                    data-content="不能关注自己哦！"
-                                                    value="{{ article.author.id }}">
-                                                关注
-                                            </button>
+                                    {% if request.user.is_authenticated %}
+                                        {% if request.user.id != article.author.id %}
+                                            <div class="col-md-3">
+                                                {% if article.author in request.user.id|my_follows %}
+                                                    <button name="focus" id="cancel" type="button"
+                                                            class="btn btn-primary"
+                                                            value="{{ article.author.id }}">
+                                                        取消关注
+                                                    </button>
+                                                {% else %}
+                                                    <button name="focus" id="ok" type="button" class="btn btn-primary"
+                                                            data-placement="top" data-toggle="popover"
+                                                            data-trigger="focus"
+                                                            data-content="不能关注自己哦！"
+                                                            value="{{ article.author.id }}">
+                                                        关注
+                                                    </button>
+                                                {% endif %}
+                                                <button name="message" type="button" class="btn btn-primary"
+                                                        data-toggle="modal"
+                                                        userId="{{ article.author.id }}"
+                                                        who="{{ article.author.nickname }}">私信
+                                                </button>
+                                            </div>
                                         {% endif %}
-                                        <button name="message" type="button" class="btn btn-primary"
-                                                data-toggle="modal"
-                                                data-target="#leave_message" userId="{{ article.author.id }}"
-                                                who="{{ article.author.nickname }}">私信
-                                        </button>
-                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="row" style="margin-top: 10px">
                                     <div class="col-md-12">
@@ -132,7 +134,8 @@
                                         <div class="praise">
                                         <span class="praiseParent"><img src="{% static 'img/zan.png' %}"
                                                                         id="praise-img"/></span>
-                                            <span id="praise-txt">{{ article.up_nums }}</span>
+                                            <span id="praise-txt"
+                                                  ArticleId='{{ article.id }}'>{{ article.up_nums }}</span>
                                             <span id="add-num"><em>+1</em></span>
                                         </div>
                                     </div>
@@ -170,40 +173,8 @@
             </div>
         </div>
     </div>
-    {#    <script>#}
-    {#        $(function () {#}
-    {#            $(".praiseParent").click(function () {#}
-    {#                var currrent = $(this);#}
-    {#                var praise_img = currrent.children();#}
-    {#                var praise_txt = currrent.next();#}
-    {#                var text_box = currrent.siblings().eq(1)#}
-    {#                //var praise_img = $("#praise-img");#}
-    {#                //var praise_txt = $("#praise-txt");#}
-    {#                //var text_box = $("#add-num");#}
-    {#                var num = parseInt(praise_txt.text());#}
-    {#                if (praise_img.attr("src") == ("{% static 'img/yizan.png' %}")) {#}
-    {#                    $(this).html("<img src='{% static 'img/zan.png' %}' id='praise-img' class='animation' />");#}
-    {#                    praise_txt.removeClass("hover");#}
-    {#                    text_box.show().html("<em class='add-animation'>-1</em>");#}
-    {#                    $(".add-animation").removeClass("hover");#}
-    {#                    num -= 1;#}
-    {#                    praise_txt.text(num)#}
-    {#                } else {#}
-    {#                    $(this).html("<img src='{% static 'img/yizan.png' %}' id='praise-img' class='animation' />");#}
-    {#                    praise_txt.addClass("hover");#}
-    {#                    text_box.show().html("<em class='add-animation'>+1</em>");#}
-    {#                    $(".add-animation").addClass("hover");#}
-    {#                    num += 1;#}
-    {#                    praise_txt.text(num)#}
-    {#                }#}
-    {#            });#}
-    {#        })#}
-    {##}
-    {#    </script>#}
-    {##}
-    {##}
     <script>
-        $(document).ready(function () {
+        $(function () {  //关注和取消关注
             $('button[name="focus"]').click(function () {
                 var focusObject = $(this);
                 $.ajax({
@@ -238,81 +209,187 @@
             });
         });
 
+        $(function () {  //提交评论
+            $('button[name="submitComment"]').click(function () {
+                var buttonObj = $(this);
+                var value = buttonObj.val();
+                var inputText = '#' + value;
+                var article_id = $(inputText).attr('name');
+                var id_list_group = '#list_group' + article_id;
+
+                $.ajax({
+                    url: '{% url 'question:comment' %}',
+                    type: 'post',
+                    dataType: 'text',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    data: {
+                        'comment_content': $(inputText).val(),
+                        'article_id': article_id
+                    },
+                    success: function (data) {
+                        if (data === 'ok') {
+                            var string = '<a class="list-group-item">\n' +
+                                '                <div class="row">\n' +
+                                '                    <div class="col-md-2">\n' +
+                                '                        <img width="80" height="80" class="img-circle img-responsive img-thumbnail"\n' +
+                                '                             src="{{ MEDIA_URL }}{{ request.user.image }}"/>\n' +
+                                '                    </div>\n' +
+                                '                    <div class="col-md-7">\n' +
+                                '                        <h4>{{ request.user.nickname|default:request.user.username }}</h4>\n' +
+                                '                        <p style="color: gray;">{{ request.user.self_description }}</p>\n' +
+                                '                    </div>\n' +
+                                '                    <div class="col-md-3">\n' +
+                                '                        <p>刚刚发表</p>\n' +
+                                '                    </div>\n' +
+                                '                </div>\n' +
+                                '                <div class="row">\n' +
+                                '                    <div class="col-md-10 col-md-offset-1">\n' +
+                                '                        <h4>' + $(inputText).val() + '</h4>\n' +
+                                '                    </div>\n' +
+                                '                </div>\n' +
+                                '                <div class="row">\n' +
+                                '                    <div class="col-md-offset-1">\n' +
+                                '                        <div  class="praise" style="margin-bottom: 20px">\n' +
+                                '                            <span class="praiseParent"><img src="{% static 'img/zan.png' %}" id="praise-img"/></span>\n' +
+                                '                            <span id="praise-txt">0</span>\n' +
+                                '                            <span id="add-num"><em>+1</em></span>\n' +
+                                '                        </div>\n' +
+                                '                    </div>\n' +
+                                '                </div>\n' +
+                                '            </a>';
+                            $(id_list_group).append(string)
+                        }
+                        else if (data === 'redirect') {
+                            $(window).attr('location', '{% url 'user:login_reg' %}');
+                        }
+                    },
+                    error: function () {
+                        alert('出现错误!');
+                    }
+                });
+            });
+        });
+
+        $(function () {  //点赞和取消点赞
+            $(".praise_include").on('click', '.praiseParent', function () {  //使用动态绑定父元素praise_include，这样可以发表后直接点赞
+                //因为当前评论由js动态生成，不能直接绑定
+                var praise_img = $(this).children();
+                var praise_num = $(this).next();
+                var article_id = praise_num.attr('ArticleId');
+                var comment_id = praise_num.attr('CommentId');
+                var text_box = $(this).siblings().eq(1);
+                var num = parseInt(praise_num.text());
+                if (praise_img.attr("src") === ("{% static 'img/yizan.png' %}")) {  //取消赞
+                    $(this).html("<img src='{% static 'img/zan.png' %}' id='praise-img' class='animation' />");
+                    praise_num.removeClass("hover");
+                    text_box.show().html("<em class='add-animation'>-1</em>");
+                    $(".add-animation").removeClass("hover");
+                    num -= 1;
+                    praise_num.text(num);
+                    $.ajax({
+                        url: "{% url 'question:thumbUp' %}",
+                        type: 'post',
+                        dataType: 'text',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        data: {
+                            'article_id': article_id,
+                            'comment_id': comment_id,
+                            'action': 'cancel'
+                        },
+                        success: function (data) {
+                            if (data === 'redirect') { //未登录
+                                $(window).attr('location', '{% url 'user:login_reg' %}');
+                            }
+                        },
+                        error: function () {
+                            alert('出现错误!');
+                        }
+                    });
+                } else {//点赞
+                    $(this).html("<img src='{% static 'img/yizan.png' %}' id='praise-img' class='animation' />");
+                    praise_num.addClass("hover");
+                    text_box.show().html("<em class='add-animation'>+1</em>");
+                    $(".add-animation").addClass("hover");
+                    num += 1;
+                    praise_num.text(num);
+                    $.ajax({
+                        url: "{% url 'question:thumbUp' %}",
+                        type: 'post',
+                        dataType: 'text',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        data: {
+                            'article_id': article_id,
+                            'comment_id': comment_id,
+                            'action': 'ok'
+                        },
+                        success: function (data) {
+                            if (data === 'redirect') { //未登录
+                                $(window).attr('location', '{% url 'user:login_reg' %}');
+                            }
+                        },
+                        error: function () {
+                            alert('出现错误!');
+                        }
+                    });
+                }
+            });
+        });
+
+        $(function () {
+            $('button[name="message"]').click(function () {
+                var messageObject = $(this);
+                var userId = messageObject.attr('userId');
+                var who = messageObject.attr('who');
+                $('#messsage_to').html('私信给: ' + who);
+                $('#leave_message').modal();
+                $('#sendTo').unbind('click');  //在click中再绑定click，多重绑定,所以先取消
+                $('#sendTo').click(function () {
+                    $.ajax({
+                        url: "{% url 'user:message' %}",
+                        type: 'post',
+                        dataType: 'text',
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                        },
+                        data: {
+                            'from_user_id': {{ request.user.id }},
+                            'message_text': $('#message_text').val(),
+                            'to_user_id': userId
+                        },
+                        success: function (data) {
+                            if (data === 'ok') {
+                                var string = '<p class="text-center text-primary" id="sendTips" style="font-size:20px;" ><strong>发送成功~</strong></p>';
+                                $('#privateMessageBody').append(string).delay('slow').fadeIn();
+                            }
+                            else if (data === 'fail') { //查无此人
+                                var string = '<p class="text-center text-danger" id="sendTips" style="font-size:20px;" ><strong>发送失败！</strong></p>';
+                                $('#privateMessageBody').append(string).delay('slow').fadeIn();
+                            }
+                            else if (data === 'redirect') { //未登录
+                                $(window).attr('location', '{% url 'user:login_reg' %}');
+                            }
+                        },
+                        error: function () {
+                            alert('出现错误!');
+                        }
+                    });
+                });
+
+            });
+        });
+
+        $(function () {  //监听madal的关闭，清空原来数据
+            $('#leave_message').on('hide.bs.modal', function () {
+                $('#message_text').val('');
+                $('#sendTips').remove();
+            })
+        })
 
     </script>
-
-
-    {#        $(document).ready(function () {#}
-    {#            $('button[name="submitComment"]').click(function () {#}
-    {#                var buttonObj = $(this);#}
-    {#                var value = buttonObj.val()#}
-    {#                var inputText = '#' + value#}
-    {#                var inputName = $(inputText).attr('name')#}
-    {#                var id_list_group = '#list_group' + inputName#}
-    {#                //alert(id_list_group);#}
-    {#                $.ajax({#}
-    {#                    url: '{% url 'article' %}',#}
-    {#                    type: 'get',#}
-    {#                    dataType: 'text',#}
-    {#                    data: {#}
-    {#                        'user_id': {{ client.id }},#}
-    {#                        'comment_text': $(inputText).val(),#}
-    {#                        'article_id': inputName#}
-    {#                    },#}
-    {#                    success: function (data) {#}
-    {#                        if (data == 'ok') {#}
-    {#                            var string = '<a class="list-group-item "><div class="row"><div class="col-md-2"><img src="/uploads/default/zhi.jpg" width="80" class="img-responsive img-thumbnail"/></div><div class="col-md-7"><h4>{{ client.nickname }}</h4><p style="color: gray;">{{ client.self_description }}</p></div><div class="col-md-3"><p>刚刚发表</p></div></div><div class="row"><div class="col-md-10 col-md-offset-1"><h4 id="list_group_item_text">' + $(inputText).val() + '</h4></div></div><div class="row"><div class="col-md-offset-1"><span class="glyphicon glyphicon-thumbs-up"><code>0</code>&nbsp;</span></div></div></a>'#}
-    {#                            $(id_list_group).append(string)#}
-    {#                        }#}
-    {#                    },#}
-    {#                    error: function () {#}
-    {#                        alert('出现错误!');#}
-    {#                    }#}
-    {#                });#}
-    {#            });#}
-    {#        });#}
-    {##}
-    {#        $(document).ready(function () {#}
-    {#            $('button[name="message"]').click(function () {#}
-    {#                var messageObject = $(this);#}
-    {#                var userId = messageObject.attr('userId');#}
-    {#                var who = messageObject.attr('who');#}
-    {#                $('#messsage_to').html('私信给: ' + who)#}
-    {#                $('#leave_message').modal();#}
-    {#                $('#sendTo').click(function () {#}
-    {#                    //alert(userId+$('#message_text').val()+{{ client.id }});#}
-    {##}
-    {#                    $.ajax({#}
-    {#                        url: "{% url 'article' %}",#}
-    {#                        type: 'get',#}
-    {#                        dataType: 'text',#}
-    {#                        data: {#}
-    {#                            'from_user_id': {{ client.id }},#}
-    {#                            'message_text': $('#message_text').val(),#}
-    {#                            'to_user_id': userId#}
-    {#                        },#}
-    {#                        success: function (data) {#}
-    {#                            if (data == 'ok') {#}
-    {#                                var string = '<p class="text-center text-primary" ><strong>发送成功</strong></p>';#}
-    {#                                setTimeout(function () {#}
-    {#                                    test();#}
-    {#                                }, 10000);#}
-    {#                                $('#privateMessageBody').append(string).delay('slow').fadeIn();#}
-    {##}
-    {#                                setTimeout(function () {#}
-    {#                                    test();#}
-    {#                                }, 100000);#}
-    {#                                $('#leave_message').modal('hide')#}
-    {#                            }#}
-    {#                        },#}
-    {#                        error: function () {#}
-    {#                            alert('出现错误!');#}
-    {#                        }#}
-    {#                    });#}
-    {#                });#}
-    {##}
-    {#            });#}
-    {#        });#}
-    {##}
-    {#    </script>#}
 {% endblock %}

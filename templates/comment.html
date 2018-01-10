@@ -5,15 +5,11 @@
             <a class="list-group-item ">
                 <div class="row">
                     <div class="col-md-2">
-                        <img width="60" height="60" class="img-circle img-responsive img-thumbnail"
-                                         src="{{ MEDIA_URL }}{{ comment.reviewer.image }}"/>
+                        <img width="80" height="80" class="img-circle img-responsive img-thumbnail"
+                             src="{{ MEDIA_URL }}{{ comment.reviewer.image }}"/>
                     </div>
                     <div class="col-md-7">
-                        {% if comment.reviewer.nickname %}
-                            <h4>{{ comment.reviewer.nickname }}</h4>
-                        {% else %}
-                            <h4>{{ comment.reviewer.username }}</h4>
-                        {% endif %}
+                        <h4>{{ comment.reviewer.nickname|default:comment.reviewer.username }}</h4>
                         <p style="color: gray;">{{ comment.reviewer.self_description }}</p>
                     </div>
                     <div class="col-md-3">
@@ -27,9 +23,9 @@
                 </div>
                 <div class="row">
                     <div class="col-md-offset-1">
-                        <div class="praise">
+                        <div class="praise" style="margin-bottom: 20px">
                             <span class="praiseParent"><img src="{% static 'img/zan.png' %}" id="praise-img"/></span>
-                            <span id="praise-txt">{{ comment.up_nums }}</span>
+                            <span id="praise-txt" CommentId='{{ comment.id }}'>{{ comment.up_nums }}</span>
                             <span id="add-num"><em>+1</em></span>
                         </div>
                     </div>
@@ -43,8 +39,10 @@
             <form>
                 <div class="row">
                     <div class="col-md-10">
-                        <input type="text" id="comment{{ article.id }}" class="form-control" name="{{ article.id }}"
-                               placeholder="来吐槽吧！"/>
+                        <textarea rows="2" cols="85" id="comment{{ article.id }}" class="form-control"
+                                  name="{{ article.id }}"
+                                  placeholder="来吐槽吧！"></textarea>
+
                     </div>
                     <div class="col-md-2">
                         <button type="button" name="submitComment" value="comment{{ article.id }}"
@@ -55,6 +53,4 @@
             </form>
         </a>
     </div>
-
 </div>
-

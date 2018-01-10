@@ -46,6 +46,7 @@ class Message(models.Model):
     from_user = models.ForeignKey(User, related_name='from_users', verbose_name='发信人')
     to_user = models.ForeignKey(User, related_name='to_users', verbose_name='收信人')
     content = models.TextField(verbose_name='私信内容')
+    has_read = models.BooleanField(default=False, verbose_name='是否已读')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='发信时间')
 
     class Meta:

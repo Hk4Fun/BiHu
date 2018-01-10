@@ -10,7 +10,7 @@ from pure_pagination import Paginator, PageNotAnInteger
 from django.views.generic.base import View
 from QandA.models import Question, Article
 from .forms import ImageUploadForm
-from .models import User, Follow
+from .models import User, Follow, Message
 from . import verify
 
 
@@ -191,8 +191,8 @@ class FollowView(View):
         followeeId = request.GET.get('followee_id')
         followTip = request.GET.get('follow_tip')
 
-        if followerId == str(request.user.id) and followeeId:
-            if followerId == followeeId: # 自己关注自己
+        if followerId == str(request.user.id) and followeeId and followTip:
+            if followerId == followeeId:  # 自己关注自己
                 return HttpResponse('self')
             elif followTip == 'cancel':
                 follow = Follow.objects.get(follower_id=int(
@@ -204,3 +204,33 @@ class FollowView(View):
                 follow.save()
                 return HttpResponse('focused')
 
+
+class MessageView(View):
+    def get(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('user:login_reg'))
+        for message in Message.objects.filter(to_user=request.user.id):  # 将未读改为已读
+            message.has_read = True
+            message.save()
+        message_list = Message.objects.filter(Q(from_user=request.user.id) | Q(
+            to_user=request.user.id)).order_by('-add_time')
+        return render(request, 'inbox.html', locals())
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponse('redirect')
+        from_user_id = request.POST.get('from_user_id')
+        to_user_id = request.POST.get('to_user_id')
+        message_text = request.POST.get('message_text')
+
+        if from_user_id == str(request.user.id) and to_user_id and message_text:
+            to_user = User.objects.filter(id=int(to_user_id))
+            if to_user:
+                message = Message()
+                message.from_user = request.user
+                message.to_user = to_user[0]
+                message.content = message_text
+                message.save()
+                return HttpResponse('ok')
+            else:
+                return HttpResponse('fail')
