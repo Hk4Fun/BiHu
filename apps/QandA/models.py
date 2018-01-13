@@ -20,7 +20,7 @@ class Question(models.Model):
     view_nums = models.IntegerField(default=0, verbose_name='浏览量')
     asker = models.ForeignKey(User, related_name='questions', verbose_name='提问者')
     tags = models.ManyToManyField(Tag, verbose_name='标签')
-    concerned_users = models.ManyToManyField(User, verbose_name='关注者')
+    concerned_users = models.ManyToManyField(User, related_name='concerned_questions',   verbose_name='关注者')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name='发布时间')
 
     def likes(self):

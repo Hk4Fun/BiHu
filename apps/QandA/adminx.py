@@ -20,10 +20,10 @@ class QuestionAdmin(object):
     readonly_fields = ['view_nums','likes']
 
 class ArticleAdmin(object):
-    list_display = ['view_nums', 'up_nums', 'down_nums', 'question', 'author', 'collected_users', 'likes', 'add_time']
+    list_display = ['up_nums', 'down_nums', 'question', 'author', 'collected_users', 'likes', 'add_time']
     search_fields = ['content', 'question__title', 'author__username', 'question__tags__name']
-    list_filter = ['view_nums', 'up_nums', 'down_nums', 'question__title', 'author__username', 'collected_users__username', 'add_time']
-    readonly_fields = ['view_nums', 'up_nums', 'down_nums', 'likes']
+    list_filter = ['up_nums', 'down_nums', 'question__title', 'author__username', 'collected_users__username', 'add_time']
+    readonly_fields = ['up_nums', 'down_nums', 'likes']
 
 
 

@@ -171,3 +171,26 @@ class ThumbDownView(View):
     def post(self, request):
         if not request.user.is_authenticated():
             return HttpResponse('redirect')
+
+
+class QuestionConcernedView(View):
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponse('redirect')
+        user_id = request.POST.get('user_id')
+        question_id = request.POST.get('question_id')
+        action = request.POST.get('action')
+
+        if user_id == str(request.user.id) and question_id and action:
+            question = Question.objects.filter(id=question_id)
+            if question:
+                question = question[0]
+                if action == 'cancel': # 取消关注
+                    question.concerned_users.remove(request.user)
+                    question.save()
+                    return HttpResponse('canceled')
+                elif action == 'ok':  # 关注
+                    question.concerned_users.add(request.user)
+                    question.save()
+                    return HttpResponse('focused')
+        return HttpResponse('fail')

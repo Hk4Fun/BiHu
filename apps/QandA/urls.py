@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^comment/$', views.CommentView.as_view(), name='comment'),
     url(r'^thumbUp/$', views.ThumbUpView.as_view(), name='thumbUp'),  # 用户点赞和取消赞
-    url(r'^thumbDown/$', views.ThumbDownView.as_view(), name='thumbDown') # 用户踩和取消踩
+    url(r'^thumbDown/$', views.ThumbDownView.as_view(), name='thumbDown'), # 用户踩和取消踩
+    url(r'^question_concerned/$', views.QuestionConcernedView.as_view(), name='question_concerned'), # 用户关注和取消关注问题
 ]

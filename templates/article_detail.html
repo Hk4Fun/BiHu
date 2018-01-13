@@ -46,6 +46,17 @@
                         <h4>{% get_question_likes question.id %} 人关注 | {{ question.view_nums }} 次浏览</h4>
                     </div>
                     <div class="row text-center" style="margin-top: 20px">
+                        {% if request.user in question.concerned_users.all %}
+                            <button type="button" class="btn btn-primary" id="cancel"
+                                    name="question_concerned" value="{{ question.id }}">取消关注
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-primary" id="ok" name="question_concerned"
+                                    value="{{ question.id }}">关注问题
+                            </button>
+                        {% endif %}
+                    </div>
+                    <div class="row text-center" style="margin-top: 20px">
                         <a class="btn btn-primary" href="{% url 'question:answer' question.id %}">
                         <span
                                 class="glyphicon glyphicon-pencil">写回答
@@ -105,14 +116,14 @@
                                                             data-trigger="focus"
                                                             data-content="不能关注自己哦！"
                                                             value="{{ article.author.id }}">
-                                                        关注
+                                                        关注TA
                                                     </button>
                                                 {% endif %}
                                                 <button name="message" type="button" class="btn btn-primary"
                                                         data-toggle="modal"
                                                         userId="{{ article.author.id }}"
                                                         who="{{ article.author.nickname|default:article.author.username }}">
-                                                    私信
+                                                    私信TA
                                                 </button>
                                             </div>
                                         {% endif %}
@@ -176,7 +187,7 @@
         </div>
     </div>
     <script>
-        $(function () {  //关注和取消关注
+        $(function () {  //关注和取消关注他人
             $('button[name="focus"]').click(function () {
                 var focusObject = $(this);
                 $.ajax({
@@ -190,7 +201,7 @@
                     },
                     success: function (data) {
                         if (data === 'canceled') {
-                            focusObject.html('关注');
+                            focusObject.html('关注TA');
                             focusObject.attr('id', 'ok')
                         }
                         else if (data === 'focused') {
@@ -202,6 +213,41 @@
                         }
                         else if (data === 'self') {
                             $('[data-toggle="popover"]').popover();
+                        }
+                    },
+                    error: function () {
+                        alert('出现错误!');
+                    }
+                });
+            });
+        });
+
+        $(function () {  //关注和取消关注问题
+            $('button[name="question_concerned"]').click(function () {
+                var focusObject = $(this);
+                $.ajax({
+                    url: '{% url "question:question_concerned" %}',
+                    type: 'post',
+                    dataType: 'text',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    data: {
+                        'user_id': {{ request.user.id|default:'-1' }},
+                        'question_id': focusObject.val(),
+                        'action': focusObject.attr('id')
+                    },
+                    success: function (data) {
+                        if (data === 'canceled') {
+                            focusObject.html('关注问题');
+                            focusObject.attr('id', 'ok')
+                        }
+                        else if (data === 'focused') {
+                            focusObject.html("取消关注");
+                            focusObject.attr('id', 'cancel')
+                        }
+                        else if (data === 'redirect') {
+                            $(window).attr('location', '{% url 'user:login_reg' %}');
                         }
                     },
                     error: function () {

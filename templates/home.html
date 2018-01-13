@@ -33,19 +33,22 @@
                                         <div class="form-group">
                                             <div class="col-sm-10">
                                                 <input id="nickname" type="text" class="form-control" placeholder="昵称"
-                                                       value="{{ user.nickname|default:'' }}" {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
+                                                       value="{{ user.nickname|default:'' }}"
+                                                       {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="col-sm-10">
                                                 <textarea id="self_description" class="form-control" rows="1"
-                                                          placeholder="个性签名"  {% if user.id != request.user.id %}readonly="readonly"{% endif %}>{{ user.self_description|default:'' }}</textarea>
+                                                          placeholder="个性签名"
+                                                          {% if user.id != request.user.id %}readonly="readonly"{% endif %}>{{ user.self_description|default:'' }}</textarea>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="col-sm-10">
                                                 <input id="mobile" type="text" class="form-control" placeholder="手机号"
-                                                       value="{{ user.mobile|default:'' }}"  {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
+                                                       value="{{ user.mobile|default:'' }}"
+                                                       {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
                                                 <small id="tipsforphone" class="text-danger"></small>
                                             </div>
                                         </div>
@@ -54,7 +57,8 @@
                                         <div class="form-group">
                                             <div class="col-sm-10">
                                                 <input id="email" type="text" class="form-control" placeholder="邮箱"
-                                                       value="{{ user.email|default:'' }}"  {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
+                                                       value="{{ user.email|default:'' }}"
+                                                       {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
                                                 <small id="tipsforemail" class="text-danger"></small>
 
                                             </div>
@@ -62,7 +66,8 @@
                                         <div class="form-group">
                                             <div class="col-sm-10">
                                                 <input id="oldPwd" type="password" class="form-control"
-                                                       placeholder="旧密码"  {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
+                                                       placeholder="旧密码"
+                                                       {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
                                                 <small id="tipsforoldpwd" class="text-danger"></small>
 
                                             </div>
@@ -70,7 +75,8 @@
                                         <div class="form-group">
                                             <div class="col-sm-10">
                                                 <input id="newPwd" type="password" class="form-control"
-                                                       placeholder="新密码"  {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
+                                                       placeholder="新密码"
+                                                       {% if user.id != request.user.id %}readonly="readonly"{% endif %}/>
                                                 <small id="tipsfornewpwd" class="text-danger"></small>
                                             </div>
                                         </div>
@@ -83,7 +89,8 @@
                                                         <label><input type="radio" name="sex" value="male"
                                                                 {% ifequal user.gender 'male' %}
                                                                       checked
-                                                                {% endifequal %}  {% if user.id != request.user.id %}disabled{% endif %}
+                                                                {% endifequal %}
+                                                                      {% if user.id != request.user.id %}disabled{% endif %}
                                                         />男</label>
                                                     </div>
                                                 </div>
@@ -94,7 +101,8 @@
                                                         <label><input type="radio" name="sex" value="female"
                                                                 {% ifequal user.gender 'female' %}
                                                                       checked
-                                                                {% endifequal %}  {% if user.id != request.user.id %}disabled{% endif %}
+                                                                {% endifequal %}
+                                                                      {% if user.id != request.user.id %}disabled{% endif %}
                                                         />女</label>
                                                     </div>
                                                 </div>
@@ -134,10 +142,10 @@
                                             <div class="row" style="margin-top: 10%">
                                                 <div class="col-md-8 col-md-offset-2">
                                                     <button name="message" type="button" class="btn btn-primary"
-                                                        data-toggle="modal"
-                                                        userId="{{ user.id }}"
-                                                        who="{{ user.nickname|default:user.username }}">私信
-                                                </button>
+                                                            data-toggle="modal"
+                                                            userId="{{ user.id }}"
+                                                            who="{{ user.nickname|default:user.username }}">私信
+                                                    </button>
                                                 </div>
                                             </div>
                                         {% endif %}
@@ -180,6 +188,10 @@
                                 {% else %}
                                     谁关注她
                                 {% endif %}<span class="badge">{{ user.follows.all.count }}</span></a>
+                        </li>
+                        <li>
+                            <a href="#QUE_CON" data-toggle="tab">关注的问题<span
+                                    class="badge">{{ user.concerned_questions.all.count }}</span></a>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -255,8 +267,7 @@
                         <div class="tab-pane" id="FOLLOWED">
                             {% for follow in user.follows.all %}
                                 <ul class="list-group">
-                                    <li class="list-group-item"
-                                        style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
+                                    <li class="list-group-item" style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <a href="{% url 'user:home' follow.follower.id %}">
@@ -283,13 +294,42 @@
                                                     </button>
                                                 {% else %}
                                                     <button type="button" class="btn btn-primary" id="ok" name="focus"
-                                                            value="{{ follow.follower.id }}" >关注
+                                                            value="{{ follow.follower.id }}">关注
                                                     </button>
                                                 {% endif %}
                                             </div>
                                         </div>
-
                                     </li>
+                                </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="tab-pane" id="QUE_CON">
+                            {% for question in user.concerned_questions.all %}
+                                <ul class="list-group">
+                                    <li class="list-group-item" style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <a href="{% url 'question:article' question.id %}"
+                                                   class="list-group-item "
+                                                   style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">{{ question.title }}
+                                                    <br>
+                                                    <small style="color: gray">{{ question.add_time|since }}</small>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="row" style="margin-top: 15%;"></div>
+                                                {% if question in request.user.concerned_questions.all %}
+                                                    <button type="button" class="btn btn-primary" id="cancel"
+                                                            name="question_concerned" value="{{ question.id }}">取消关注
+                                                    </button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-primary" id="ok"
+                                                            name="question_concerned"
+                                                            value="{{ question.id }}">关注
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
                                 </ul>
                             {% endfor %}
                         </div>
@@ -422,7 +462,7 @@
                         else if (data === 'redirect') {
                             $(window).attr('location', '{% url 'user:login_reg' %}');
                         }
-                        else if(data === 'self'){
+                        else if (data === 'self') {
                             $('[data-toggle="popover"]').popover();
                         }
                     },
@@ -440,6 +480,41 @@
                 $('#oldPwd').val('');
                 $('#newPwd').val();
             })
+        });
+
+        $(function () {  //关注和取消关注问题
+            $('button[name="question_concerned"]').click(function () {
+                var focusObject = $(this);
+                $.ajax({
+                    url: '{% url "question:question_concerned" %}',
+                    type: 'post',
+                    dataType: 'text',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    },
+                    data: {
+                        'user_id': {{ request.user.id|default:'-1' }},
+                        'question_id': focusObject.val(),
+                        'action': focusObject.attr('id')
+                    },
+                    success: function (data) {
+                        if (data === 'canceled') {
+                            focusObject.html('关注问题');
+                            focusObject.attr('id', 'ok')
+                        }
+                        else if (data === 'focused') {
+                            focusObject.html("取消关注");
+                            focusObject.attr('id', 'cancel')
+                        }
+                        else if (data === 'redirect') {
+                            $(window).attr('location', '{% url 'user:login_reg' %}');
+                        }
+                    },
+                    error: function () {
+                        alert('出现错误!');
+                    }
+                });
+            });
         });
 
         $(function () {
@@ -490,7 +565,7 @@
                 $('#message_text').val('');
                 $('#privateMessageBody').children('#sendTips').remove();
             })
-        })
+        });
 
 
     </script>
