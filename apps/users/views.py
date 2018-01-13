@@ -232,5 +232,4 @@ class MessageView(View):
                 message.content = message_text
                 message.save()
                 return HttpResponse('ok')
-            else:
-                return HttpResponse('fail')
+        return HttpResponse('fail')

@@ -1,11 +1,10 @@
-import json, re, os
+import json, re
 from django.shortcuts import render
 from django.db.models import Q, Count
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
-from users.models import User
 from .models import Tag, Question, Article, Comment
 from .handler import image_upload
 import datetime
@@ -37,6 +36,8 @@ class ArticleView(View):
         question = Question.objects.filter(id=int(qid))
         if question:
             question = question[0]
+            question.view_nums += 1
+            question.save()
             # 相关问题
             tags = Question.objects.get(id=int(qid)).tags.all()
             questions = []
@@ -132,12 +133,13 @@ class CommentView(View):
             comment.save()
             return HttpResponse('ok')
 
+
 class ThumbUpView(View):
     def post(self, request):
         if not request.user.is_authenticated():
             return HttpResponse('redirect')
-        article_id = request.POST.get('article_id','')
-        comment_id = request.POST.get('comment_id','')
+        article_id = request.POST.get('article_id', '')
+        comment_id = request.POST.get('comment_id', '')
         action = request.POST.get('action', '')
         if article_id and action:  # 给文章点赞或取消赞
             articles = Article.objects.filter(id=article_id)
@@ -150,7 +152,7 @@ class ThumbUpView(View):
                     articles[0].up_nums -= 1
                     articles[0].save()
                     return HttpResponse('success')
-        elif comment_id and action: # 给评论点赞获取消赞
+        elif comment_id and action:  # 给评论点赞获取消赞
             comments = Comment.objects.filter(id=comment_id)
             if comments:
                 if action == 'ok':

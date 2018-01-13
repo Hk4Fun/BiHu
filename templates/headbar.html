@@ -10,7 +10,7 @@
 <body>
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="row">
-        <div class="col-md-10 col-md-offset-2">
+        <div class="col-md-1 col-md-offset-1">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse"
                         data-target=".navbar-responsive-collapse">
@@ -19,7 +19,8 @@
                 <a href="{% url 'index' %}"><img width="70" height="50" src="{% static 'img/logo.png' %}"></a>
 
             </div>
-            <div class="collapse navbar-collapse navbar-responsive-collapse">
+        </div>
+            <div class=" col-md-7 collapse navbar-collapse navbar-responsive-collapse">
                 <form class="navbar-form navbar-left" action="{% url 'question:search' %}" method="get">
                     {% csrf_token %}
                     <div class="form-group">
@@ -32,7 +33,7 @@
                 </form>
                 <ul class="nav navbar-nav">
                     <li class="active">
-                        <a href="{% url 'index' %}"><span class="glyphicon glyphicon-home">首页</span></a>
+                        <a href="{% url 'index' %}"><span class="glyphicon glyphicon-home"><strong> 首页</strong></span></a>
 
                     </li>
 
@@ -51,7 +52,9 @@
                     <li>
                         {% if request.user.is_authenticated %}
                             <a href="" class="dropdown-toggle " data-toggle="dropdown">
-                                <strong>{{ request.user.nickname|default:request.user.username}}</strong>
+                                <strong>{{ request.user.nickname|default:request.user.username}}
+                                    <span
+                                        class="badge" style="margin-bottom: 5px; padding-bottom: 5px; background-color: deepskyblue">{% unread_message_num request.user.id %}</span></strong>
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
@@ -84,7 +87,7 @@
                 </ul>
 
             </div>
-        </div>
+
     </div>
 </nav>
 

@@ -40,7 +40,6 @@ class Question(models.Model):
 
 class Article(models.Model):
     content = models.TextField(verbose_name='内容')
-    view_nums = models.IntegerField(default=0, verbose_name='浏览量')
     up_nums = models.IntegerField(default=0, verbose_name='点赞量')
     down_nums = models.IntegerField(default=0, verbose_name='踩量')
     question = models.ForeignKey(Question, related_name='articles', verbose_name='问题')
