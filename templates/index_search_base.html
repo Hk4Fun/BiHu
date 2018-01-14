@@ -13,21 +13,25 @@
                               style="margin-bottom: 20px">&nbsp;<strong>关于我</strong></span>
                         {% if request.user.is_authenticated %}
                             <div class="list-group">
-                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item active">我的提问<span
+                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item active"><span
+                                        class="glyphicon glyphicon-question-sign"></span>&nbsp;&nbsp;我的提问<span
                                         class="badge">{{ request.user.questions.count }}</span></a>
-                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item">我的回答<span
+                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item"><span
+                                        class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;我的回答<span
                                         class="badge">{{ request.user.articles.count }}</span></a>
-                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item">我的评论<span
+                                <a href="{% url 'user:home' request.user.id %}" class="list-group-item"><span
+                                        class="glyphicon glyphicon-comment"></span>&nbsp;&nbsp;我的评论<span
                                         class="badge">{{ request.user.comments.count }}</span></a>
                             </div>
                         {% else %}
                             <div class="list-group">
-                                <a href="#" class="list-group-item active">我的提问<span
-                                        class="badge">0</span></a>
-                                <a href="#" class="list-group-item">我的回答<span
-                                        class="badge">0</span></a>
-                                <a href="#" class="list-group-item">我的评论<span
-                                        class="badge">0</span></a>
+                                <a href="#" class="list-group-item active">
+                                    <span class="glyphicon glyphicon-question-sign"></span>&nbsp;&nbsp;
+                                    我的提问<span class="badge">0</span></a>
+                                <a href="#" class="list-group-item"><span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;
+                                    我的回答<span class="badge">0</span></a>
+                                <a href="#" class="list-group-item"><span class="glyphicon glyphicon-comment"></span>&nbsp;&nbsp;
+                                    我的评论<span class="badge">0</span></a>
                             </div>
                         {% endif %}
 
@@ -37,6 +41,8 @@
                     <div class="col-md-10 ">
                         <div class="row">
                             <div class=" col-md-offset-1">
+                                <span class="glyphicon glyphicon-list-alt"
+                              style="margin-bottom: 20px">&nbsp;<strong>排行版</strong></span>
                                 <ul class="nav nav-pills">
                                     <li class="active">
                                         <a href="#NewQues" id="NewQues-tab" data-toggle="tab">最新提问</a>

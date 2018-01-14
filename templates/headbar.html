@@ -20,73 +20,77 @@
 
             </div>
         </div>
-            <div class=" col-md-7 collapse navbar-collapse navbar-responsive-collapse">
-                <form class="navbar-form navbar-left" action="{% url 'question:search' %}" method="get">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <input id="searchText" type="text" value="{{ searchText|default:"" }}" class="form-control"
-                               size="60" placeholder="搜索你感兴趣的问题或话题标签" name="searchText"/>
-                    </div>
-                    <button type="submit" id="searchButton" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-search"></span>
+        <div class=" col-md-7 collapse navbar-collapse navbar-responsive-collapse">
+            <form class="navbar-form navbar-left" action="{% url 'question:search' %}" method="get">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input id="searchText" type="text" value="{{ searchText|default:"" }}" class="form-control"
+                           size="60" placeholder="搜索你感兴趣的问题或话题标签" name="searchText"/>
+                </div>
+                <button type="submit" id="searchButton" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </form>
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="{% url 'index' %}"><span class="glyphicon glyphicon-home"><strong> 首页</strong></span></a>
+
+                </li>
+
+            </ul>
+
+            <ul class="nav navbar-nav">
+                <li>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </li>
+                <li>
+
+                    <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal"
+                            data-target="#myModal"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;提问
                     </button>
-                </form>
-                <ul class="nav navbar-nav">
-                    <li class="active">
-                        <a href="{% url 'index' %}"><span class="glyphicon glyphicon-home"><strong> 首页</strong></span></a>
-
-                    </li>
-
-                </ul>
-
-                <ul class="nav navbar-nav">
-                    <li>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal"
-                                data-target="#myModal">提问
-                        </button>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    </li>
-                    <li>
-                        {% if request.user.is_authenticated %}
-                            <a href="" class="dropdown-toggle " data-toggle="dropdown">
-                                <strong>{{ request.user.nickname|default:request.user.username}}
-                                    <span
-                                        class="badge" style="margin-bottom: 5px; padding-bottom: 5px; background-color: deepskyblue">{% unread_message_num request.user.id %}</span></strong>
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="{% url 'user:home' request.user.id %}"><span
-                                            class="glyphicon glyphicon-home">&nbsp;我的主页</span></a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'user:message' %}"><span
-                                            class="glyphicon glyphicon-envelope">&nbsp;我的私信 <span
-                                        class="badge" style="margin-bottom: 5px; padding-bottom: 5px">{% unread_message_num request.user.id %}</span></span></a>
-                                </li>
-                                <li>
-                                    <a id="logout" href="{% url 'user:logout' %}"><span class="glyphicon glyphicon-off">&nbsp;退出</span></a>
-                                </li>
-                            </ul>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </li>
+                <li>
+                    {% if request.user.is_authenticated %}
+                        <a href="" class="dropdown-toggle " data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-user"></span>
+                            <strong>{{ request.user.nickname|default:request.user.username }}
+                                <span
+                                        class="badge"
+                                        style="margin-bottom: 5px; padding-bottom: 5px; background-color: deepskyblue">{% unread_message_num request.user.id %}</span></strong>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
                             <li>
-                                <div>
-                                    <a href="{% url 'user:home' request.user.id %}">
-                                        <img width="60" height="60" class="img-circle img-responsive img-thumbnail"
-                                         src="{{ MEDIA_URL }}{{ request.user.image }}"/>
-                                    </a>
-                                </div>
+                                <a href="{% url 'user:home' request.user.id %}"><span
+                                        class="glyphicon glyphicon-home">&nbsp;我的主页</span></a>
                             </li>
-                        {% else %}
-                            <a href="{% url 'user:login_reg' %}" style="padding-top: 7.5px; padding-bottom: 7px">
-                                <button type="button" class="btn btn-danger" >请登录</button>
-                            </a>
-                        {% endif %}
-                </ul>
+                            <li>
+                                <a href="{% url 'user:message' %}"><span
+                                        class="glyphicon glyphicon-envelope">&nbsp;我的私信 <span
+                                        class="badge"
+                                        style="margin-bottom: 5px; padding-bottom: 5px">{% unread_message_num request.user.id %}</span></span></a>
+                            </li>
+                            <li>
+                                <a id="logout" href="{% url 'user:logout' %}"><span class="glyphicon glyphicon-off">&nbsp;退出</span></a>
+                            </li>
+                        </ul>
+                        <li>
+                            <div>
+                                <a href="{% url 'user:home' request.user.id %}">
+                                    <img width="60" height="60" class="img-circle img-responsive img-thumbnail"
+                                         src="{{ MEDIA_URL }}{{ request.user.image }}"/>
+                                </a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <a href="{% url 'user:login_reg' %}" style="padding-top: 7.5px; padding-bottom: 7px">
+                            <button type="button" class="btn btn-danger">请登录</button>
+                        </a>
+                    {% endif %}
+            </ul>
 
-            </div>
+        </div>
 
     </div>
 </nav>

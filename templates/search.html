@@ -28,6 +28,7 @@
                             </a>
                         </div>
                         <div class="col-md-5">
+                            <span class="glyphicon glyphicon-question-sign"></span>&nbsp;
                             <span style="color: gray">提出了问题 · {{ question.add_time|since }}</span>
                         </div>
                     </div>
@@ -52,6 +53,8 @@
             <h4>
                 {% load humanize %}
                 <span class="glyphicon glyphicon-heart"><code>{{ question.concerned_users.all.count }}</code>&nbsp;</span>
+                <span class="glyphicon glyphicon-eye-open"><code>{{ question.view_nums }}</code>&nbsp;</span>
+                <span class="glyphicon glyphicon-pencil"><code>{{ question.articles.all.count }}</code>&nbsp;</span>
                 <span class="glyphicon glyphicon-calendar"><code>{{ question.add_time|date:'Y年 M  j号  D' }}</code>&nbsp;</span>
             </h4>
         </div>

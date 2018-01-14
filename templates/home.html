@@ -203,7 +203,10 @@
                                            class="list-group-item "
                                            style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">{{ article.question.title }}
                                             <br>
-                                            <small style="color: gray">{{ article.add_time|since }}</small>
+                                            <small style="color: gray">{{ article.question.add_time|since }}
+                                                · {{ article.question.articles.all.count }}个回答
+                                                · {{ article.question.concerned_users.all.count }}人关注
+                                            </small>
                                         </a>
                                     </li>
                                 {% endfor %}
@@ -217,7 +220,10 @@
                                         <a href="{% url 'question:article' question.id %}" class="list-group-item "
                                            style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">{{ question.title }}
                                             <br>
-                                            <small style="color: gray">{{ question.add_time|since }}</small>
+                                            <small style="color: gray">{{ question.add_time|since }}
+                                                · {{ question.articles.all.count }}个回答
+                                                · {{ question.concerned_users.all.count }}人关注
+                                            </small>
                                         </a>
                                     </li>
                                 {% endfor %}
@@ -232,7 +238,7 @@
                                             <div class="col-md-3">
                                                 <a href="{% url 'user:home' follow.follow.id %}">
                                                     <img class="img-circle img-responsive img-thumbnail"
-                                                         style="width: 60px"
+                                                         style="width: 85px"
                                                          src="{{ MEDIA_URL }}{{ follow.follow.image }}"/>
                                                 </a>
                                             </div>
@@ -243,7 +249,11 @@
                                                         {% else %}{{ follow.follow.username }}{% endif %}</a></h4>
                                                 </div>
                                                 <div class="row">
-                                                    <p style="color: gray">{{ follow.follow.self_description }}</p>
+                                                    <p style="font-size: medium">{{ follow.follow.self_description }}</p>
+                                                </div>
+                                                <div class="row">
+                                                    <p style="color: gray">{{ follow.follow.articles.all.count }}回答
+                                                        · {% my_followers_count follow.follow_id %}关注者</p>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
@@ -267,12 +277,13 @@
                         <div class="tab-pane" id="FOLLOWED">
                             {% for follow in user.follows.all %}
                                 <ul class="list-group">
-                                    <li class="list-group-item" style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
+                                    <li class="list-group-item"
+                                        style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <a href="{% url 'user:home' follow.follower.id %}">
                                                     <img class="img-circle img-responsive img-thumbnail"
-                                                         style="width: 60px"
+                                                         style="width: 85px"
                                                          src="{{ MEDIA_URL }}{{ follow.follower.image }}"/>
                                                 </a>
                                             </div>
@@ -283,7 +294,11 @@
                                                         {% else %}{{ follow.follower.username }}{% endif %}</a></h4>
                                                 </div>
                                                 <div class="row">
-                                                    <p style="color: gray">{{ follow.follower.self_description }}</p>
+                                                    <p style="font-size: medium">{{ follow.follower.self_description }}</p>
+                                                </div>
+                                                <div class="row">
+                                                    <p style="color: gray">{{ follow.follower.articles.all.count }}回答
+                                                        · {% my_followers_count follow.follower_id %}关注者</p>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
@@ -306,14 +321,18 @@
                         <div class="tab-pane" id="QUE_CON">
                             {% for question in user.concerned_questions.all %}
                                 <ul class="list-group">
-                                    <li class="list-group-item" style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
+                                    <li class="list-group-item"
+                                        style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %}">
                                         <div class="row">
                                             <div class="col-md-9">
                                                 <a href="{% url 'question:article' question.id %}"
                                                    class="list-group-item "
                                                    style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">{{ question.title }}
                                                     <br>
-                                                    <small style="color: gray">{{ question.add_time|since }}</small>
+                                                    <small style="color: gray">{{ question.add_time|since }}
+                                                        · {{ question.articles.all.count }}个回答
+                                                        · {{ question.concerned_users.all.count }}人关注
+                                                    </small>
                                                 </a>
                                             </div>
                                             <div class="col-md-3">

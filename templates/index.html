@@ -29,6 +29,7 @@
                                 </a>
                             </div>
                             <div class="col-md-5">
+                                <span class="glyphicon glyphicon-question-sign"></span>&nbsp;
                                 <span style="color: gray">提出了问题 · {{ qa.add_time|since }}</span>
                             </div>
                         </div>
@@ -53,6 +54,8 @@
                 <h4>
                     {% load humanize %}
                     <span class="glyphicon glyphicon-heart"><code>{{ qa.concerned_users.all.count }}</code>&nbsp;</span>
+                    <span class="glyphicon glyphicon-eye-open"><code>{{ qa.view_nums }}</code>&nbsp;</span>
+                    <span class="glyphicon glyphicon-pencil"><code>{{ qa.articles.all.count }}</code>&nbsp;</span>
                     <span class="glyphicon glyphicon-calendar"><code>{{ qa.add_time|date:'Y年 M  j号  D' }}</code>&nbsp;</span>
                 </h4>
             </div>
@@ -79,6 +82,7 @@
                                 </a>
                             </div>
                             <div class="col-md-5">
+                                <span class="glyphicon glyphicon-pencil"></span>&nbsp;
                                 <span style="color: gray">回答了问题 · {{ qa.add_time|since }}</span>
                             </div>
                         </div>
@@ -105,6 +109,8 @@
                 <h4>
                     {% load humanize %}
                     <span class="glyphicon glyphicon-heart"><code>{{ qa.collected_users.all.count }}</code>&nbsp;</span>
+                    <span class="glyphicon glyphicon-thumbs-up"><code>{{ qa.up_nums }}</code>&nbsp;</span>
+                    <span class="glyphicon glyphicon-comment"><code>{{ qa.comments.all.count }}</code>&nbsp;</span>
                     <span class="glyphicon glyphicon-calendar"><code>{{ qa.add_time|date:'Y年 M  j号  D' }}</code>&nbsp;</span>
                 </h4>
             </div>

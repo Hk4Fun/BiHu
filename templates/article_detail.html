@@ -72,7 +72,7 @@
                     <div class="list-group">
                         <a href="#" class="list-group-item ">
                             <h4 class="text-center"><span
-                                    class="glyphicon glyphicon-pencil">{{ question.articles.count }}个回答</span>
+                                    class="glyphicon glyphicon-pencil">&nbsp;{{ question.articles.count }}个回答</span>
                             </h4>
                         </a>
                     </div>
@@ -167,7 +167,7 @@
                 <div class="row">
                     <div class="list-group">
                         <a class="list-group-item ">
-                            <h4 class="text-center"><span class="glyphicon glyphicon-list-alt">相关问题</span>
+                            <h4 class="text-center"><span class="glyphicon glyphicon-list-alt">&nbsp;相关问题</span>
                             </h4>
                         </a>
                     </div>
@@ -177,8 +177,10 @@
                                style="background-color:{% cycle '#dff0d8'  '#d9edf7' '#fcf8e3'  '#f2dede' %};">
                                 {{ question.title }}
                                 <br>
-                                <small style="color: gray">{% get_question_likes question.id %}个<span
-                                        class="glyphicon glyphicon-heart"></span></small>
+                                <small style="color: gray">{{ question.add_time|since }}
+                                                · {{ question.articles.all.count }}个回答
+                                                · {{ question.concerned_users.all.count }}人关注
+                                            </small>
                             </a>
                         {% endfor %}
                     </div>
