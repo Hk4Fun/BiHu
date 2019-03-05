@@ -19,11 +19,10 @@ from .settings import MEDIA_ROOT
 import xadmin
 from users import views
 
-
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),  # 上传文件的访问url
-    url(r'^user/', include('users.urls', namespace='user')),
-    url(r'^question/', include('QandA.urls', namespace='question')),
+    url(r'^user/', include(('users.urls', 'users'), namespace='user')),
+    url(r'^question/', include(('QandA.urls', 'QandA'), namespace='question')),
 ]

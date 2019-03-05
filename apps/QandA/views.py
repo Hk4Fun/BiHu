@@ -2,7 +2,7 @@ import json, re
 from django.shortcuts import render
 from django.db.models import Q, Count
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views.generic.base import View
 from pure_pagination import Paginator, PageNotAnInteger
 from .models import Tag, Question, Article, Comment
@@ -12,7 +12,7 @@ import datetime
 
 class AskView(View):
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('{"status":"failed"}', content_type='application/json')
         question = Question()
         question.title = request.POST['question_name']
@@ -50,7 +50,7 @@ class ArticleView(View):
 
 class AnswerView(View):
     def get(self, request, qid):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(reverse('user:login_reg'))
         question = Question.objects.filter(id=int(qid))
         if question:
@@ -88,7 +88,7 @@ class UploadEditorImageView(View):
         # {"error": 1, "message": "出错信息"}
         # {"error": 0, "url": "图片地址"}
         ##################
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(reverse('user:login_reg'))
         result = {"error": 1, "message": "上传出错！"}
         files = request.FILES.get("imgFile", None)
@@ -121,7 +121,7 @@ class SearchView(View):
 
 class CommentView(View):
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('redirect')
         comment_content = request.POST.get('comment_content', '')
         article_id = request.POST.get('article_id', '')
@@ -136,7 +136,7 @@ class CommentView(View):
 
 class ThumbUpView(View):
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('redirect')
         article_id = request.POST.get('article_id', '')
         comment_id = request.POST.get('comment_id', '')
@@ -169,13 +169,13 @@ class ThumbUpView(View):
 
 class ThumbDownView(View):
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('redirect')
 
 
 class QuestionConcernedView(View):
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('redirect')
         user_id = request.POST.get('user_id')
         question_id = request.POST.get('question_id')

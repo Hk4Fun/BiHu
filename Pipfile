@@ -9,6 +9,7 @@ verify_ssl = true
 django = "*"
 xadmin = {path = "./xadmin-django2.zip"}
 pillow = "*"
+django-pure-pagination = "*"
 
 [requires]
 python_version = "3.7"

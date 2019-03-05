@@ -5,7 +5,7 @@ from django.db.models import Q, Count
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from pure_pagination import Paginator, PageNotAnInteger
 from django.views.generic.base import View
 from QandA.models import Question, Article
@@ -102,7 +102,7 @@ class LogoutView(View):
 
 class HomeView(View):
     def get(self, request, uid):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(reverse('user:login_reg'))
         user = User.objects.filter(id=int(uid))
         if user:
@@ -110,7 +110,7 @@ class HomeView(View):
             return render(request, 'home.html', locals())
 
     def post(self, request, uid):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('{"status":"fail", "redirect":"用户未登陆！"}', content_type='application/json')
 
         if request.user.pwd_input_wrong_times == 3:  # 修改密码错了3次直接退出并返回登录页面
@@ -169,7 +169,7 @@ class HomeView(View):
 class ImageUploadView(View):
     def post(self, request):
         # 用户头像上传
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(reverse('user:login_reg'))
         # 用户头像放在request的FILES字段中
         # instance=request.user 传递一个实例给这个model，这样直接赋值，相当于
@@ -185,7 +185,7 @@ class ImageUploadView(View):
 
 class FollowView(View):
     def get(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('redirect')
         followerId = request.GET.get('follower_id')
         followeeId = request.GET.get('followee_id')
@@ -207,7 +207,7 @@ class FollowView(View):
 
 class MessageView(View):
     def get(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(reverse('user:login_reg'))
         for message in Message.objects.filter(to_user=request.user.id):  # 将未读改为已读
             message.has_read = True
@@ -217,7 +217,7 @@ class MessageView(View):
         return render(request, 'inbox.html', locals())
 
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse('redirect')
         from_user_id = request.POST.get('from_user_id')
         to_user_id = request.POST.get('to_user_id')
