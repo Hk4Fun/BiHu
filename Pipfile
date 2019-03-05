@@ -1,0 +1,14 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django = "*"
+xadmin = {path = "./xadmin-django2.zip"}
+pillow = "*"
+
+[requires]
+python_version = "3.7"
