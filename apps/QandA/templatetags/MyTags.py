@@ -28,18 +28,22 @@ def since(t):
 
     return '%s年%s月%s日' % (t.year, t.month, t.day)
 
+
 @register.filter()
 def my_follows(uid):  # 获取关注的人
-    return [fol.follow  for fol in Follow.objects.filter(follower=uid)]
+    return [fol.follow for fol in Follow.objects.filter(follower=uid)]
+
 
 @register.filter()
 def my_followers(uid):  # 获取关注我的人
     return [fol.follower for fol in Follow.objects.filter(follow=uid)]
 
+
 @register.simple_tag()
 def my_followers_count(uid):  # 获取关注我的人的数量
     return len([fol.follower for fol in Follow.objects.filter(follow=uid)])
 
-@register.simple_tag() # 获取用户未读消息数量
+
+@register.simple_tag()  # 获取用户未读消息数量
 def unread_message_num(uid):
     return Message.objects.filter(to_user=uid, has_read=False).count()
